@@ -1,0 +1,32 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title NotificationService - C3 Component Diagram
+
+Container(notificationService, "NotificationService API", ".NET Core Web API")
+
+ContainerDb(notificationDb, "Notification Database", "SQL Server")
+
+Component(notificationController, "NotificationController", "API Controller", "Handles incoming notification requests")
+
+Component(notificationServiceComp, "NotificationService", "Service Layer", "Business logic for sending notifications")
+
+Component(emailService, "EmailService", "Infrastructure Service", "Sends emails via SMTP")
+
+Component(notificationRepository, "NotificationRepository", "Repository", "Handles DB operations")
+
+Component(identityApi, "Identity API Client", "Refit Client", "Fetches user email from IdentityService")
+
+Component(refDataService, "RefDataService", "Service", "Resolves RefSet/RefTerm values")
+
+' Relationships
+Rel(notificationController, notificationServiceComp, "Calls")
+
+Rel(notificationServiceComp, emailService, "Send Email")
+Rel(notificationServiceComp, notificationRepository, "Save Notification")
+Rel(notificationServiceComp, identityApi, "Get User Email")
+Rel(notificationServiceComp, refDataService, "Get Status/Type IDs")
+
+Rel(notificationRepository, notificationDb, "CRUD")
+
+@enduml

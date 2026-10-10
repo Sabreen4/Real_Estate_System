@@ -1,0 +1,59 @@
+@startuml
+title BookingService - ERD
+
+entity RefSet {
+  +Id : INT <<PK>>
+  --
+  Key : VARCHAR(20)
+  Description : VARCHAR(50)
+}
+
+entity RefTerm {
+  +Id : INT <<PK>>
+  --
+  Key : VARCHAR(20)
+  Description : VARCHAR(50)
+}
+
+entity SetRefTerm {
+  +Id : INT <<PK>>
+  RefSetId : INT <<FK>>
+  RefTermId : INT <<FK>>
+}
+
+entity Appointment {
+  +Id : INT <<PK>>
+
+  PropertyId : INT <<Reference>>
+  UserId : INT <<Reference>>
+
+  StatusId : INT <<FK>>
+
+  --
+
+  VisitDate : DATETIME
+  CreatedDate : DATETIME
+}
+
+entity Transaction {
+  +Id : INT <<PK>>
+
+  PropertyId : INT  <<Reference>>
+  BuyerId : INT <<Reference>>
+  SellerId : INT <<Reference>>
+
+  StatusId : INT <<FK>>
+
+  --
+
+  Amount : DECIMAL(10,2)
+  TransactionDate : DATETIME
+}
+
+RefSet ||--o{ SetRefTerm
+RefTerm ||--o{ SetRefTerm
+
+RefTerm ||--o{ Appointment : StatusId
+RefTerm ||--o{ Transaction : StatusId
+
+@enduml

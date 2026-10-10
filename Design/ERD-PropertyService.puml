@@ -1,0 +1,86 @@
+@startuml
+title PropertyService - ERD
+
+entity RefSet {
+  +Id : INT <<PK>>
+  --
+  Key : VARCHAR(20)
+  Description : VARCHAR(50)
+}
+
+entity RefTerm {
+  +Id : INT <<PK>>
+  --
+  Key : VARCHAR(20)
+  Description : VARCHAR(50)
+}
+
+entity SetRefTerm {
+  +Id : INT <<PK>>
+  RefSetId : INT <<FK>>
+  RefTermId : INT <<FK>>
+}
+
+entity Property {
+  +Id : INT <<PK>>
+
+  UserId : INT <<Reference>>
+
+  PropertyTypeId : INT <<FK>>
+  ListingTypeId : INT <<FK>>
+  StatusId : INT <<FK>>
+
+  --
+
+  Title : VARCHAR(50)
+  Description : TEXT
+
+  City : VARCHAR(50)
+  State : VARCHAR(50)
+  ZipCode : VARCHAR(10)
+
+  Price : DECIMAL(10,2)
+  Size : INT
+
+ 
+
+  CreatedDate : DATETIME
+}
+
+entity PropertyImage {
+  +Id : INT <<PK>>
+  PropertyId : INT <<FK>>
+
+  --
+
+  Image : VARCHAR(255)
+  ContentType : VARCHAR(50)
+}
+
+entity Offer {
+  +Id : INT <<PK>>
+
+  PropertyId : INT <<FK>>
+  UserId : INT  <<Reference>>
+
+  StatusId : INT <<FK>>
+
+  --
+
+  OfferAmount : DECIMAL(10,2)
+  CreatedDate : DATETIME
+}
+
+RefSet ||--o{ SetRefTerm
+RefTerm ||--o{ SetRefTerm
+
+RefTerm ||--o{ Property : PropertyTypeId
+RefTerm ||--o{ Property : ListingTypeId
+RefTerm ||--o{ Property : StatusId
+
+RefTerm ||--o{ Offer : StatusId
+
+Property ||--o{ PropertyImage
+Property ||--o{ Offer
+
+@enduml

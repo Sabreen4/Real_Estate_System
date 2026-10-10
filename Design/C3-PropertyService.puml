@@ -1,0 +1,60 @@
+@startuml
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title PropertyService - C3 Component Diagram
+
+Container(propertyService, "PropertyService API", ".NET Core Web API")
+ContainerDb(propertyDb, "Property Schema", "SQL Server")
+
+' Controllers
+Component(propertyController,"PropertiesController","API Controller","Handles property-related HTTP requests")
+
+Component(imageController,"PropertyImagesController","API Controller","Handles property image operations")
+
+Component(offerController,"OffersController","API Controller","Handles property offer operations")
+
+' Query Handlers (CQRS)
+Component(getPropertyQuery,"GetPropertyQueryHandler","MediatR Query Handler","Retrieves property by ID")
+
+Component(searchPropertyQuery,"SearchPropertyQueryHandler","MediatR Query Handler","Searches properties with filters")
+
+' Command Handlers
+Component(createPropertyCommand,"CreatePropertyCommandHandler","MediatR Command Handler","Creates property")
+
+Component(updatePropertyCommand,"UpdatePropertyCommandHandler","MediatR Command Handler","Updates property")
+
+Component(deletePropertyCommand,"DeletePropertyCommandHandler","MediatR Command Handler","Deletes property")
+
+' Repository
+Component(propertyRepository,"PropertyRepository","EF Core Repository","Handles database operations")
+
+' Relationships
+
+Rel(propertyController, getPropertyQuery, "Calls")
+
+Rel(propertyController, searchPropertyQuery, "Calls")
+
+Rel(propertyController, createPropertyCommand, "Calls")
+
+Rel(propertyController, updatePropertyCommand, "Calls")
+
+Rel(propertyController, deletePropertyCommand, "Calls")
+
+Rel(imageController, propertyRepository, "Stores images")
+
+Rel(offerController, propertyRepository, "Stores offers")
+
+Rel(getPropertyQuery, propertyRepository, "Reads")
+
+Rel(searchPropertyQuery, propertyRepository, "Reads")
+
+Rel(createPropertyCommand, propertyRepository, "Writes")
+
+Rel(updatePropertyCommand, propertyRepository, "Writes")
+
+Rel(deletePropertyCommand, propertyRepository, "Writes")
+
+Rel(propertyRepository, propertyDb, "Reads/Writes")
+
+@enduml

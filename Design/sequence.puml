@@ -1,0 +1,199 @@
+@startuml
+title Real Estate Microservices - Sequence Diagram (CQRS + MediatR)
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+
+actor Buyer
+actor "Agent/Seller" as Agent
+actor Admin
+
+participant "API Gateway" as GW
+
+== SERVICES ==
+
+participant "Identity Service\nController" as IC
+participant "Property Service\nController" as PC
+participant "Booking Service\nController" as BC
+
+participant "Auth Middleware" as AM
+participant "MediatR" as M
+participant "Handler" as H
+participant "Repository" as R
+
+participant "Identity DB" as IDB
+participant "Property DB" as PDB
+participant "Booking DB" as BDB
+
+participant "Notification Service" as NS
+
+' ===================================================
+== 1. User Authentication ==
+
+Buyer -> GW : POST /api/auth/login
+GW -> IC : Forward Request
+
+IC -> M : Send(LoginCommand)
+M -> H : Handle LoginCommand
+H -> R : GetUserByEmail()
+R -> IDB : SELECT User
+IDB --> R : User Record
+R --> H : User Entity
+
+alt Valid Credentials
+    H --> M : JWT Token
+    M --> IC : Token
+    IC --> GW : Token
+    GW --> Buyer : 200 OK + JWT
+else Invalid Credentials
+    H --> M : Unauthorized
+    M --> IC : Unauthorized
+    IC --> GW : Unauthorized
+    GW --> Buyer : 401 Unauthorized
+end
+
+' ===================================================
+== 2. Create Property (Agent) ==
+
+Agent -> GW : POST /api/properties
+GW -> PC : Forward Request
+
+PC -> AM : Validate JWT
+AM --> PC : Authorized
+
+PC -> M : Send(CreatePropertyCommand)
+M -> H : Handle Command
+H -> R : AddProperty()
+
+R -> PDB : INSERT Property
+PDB --> R : Saved
+
+R --> H : Property
+H --> M : Result
+M --> PC : Result
+PC --> GW : Created
+GW --> Agent : 201 Created
+
+' ===================================================
+== 3. Search Properties (Buyer) ==
+
+Buyer -> GW : GET /api/properties
+GW -> PC : Forward Request
+
+PC -> AM : Validate JWT
+AM --> PC : Authorized
+
+PC -> M : Send(GetPropertiesQuery)
+M -> H : Handle Query
+
+H -> R : GetFilteredProperties()
+R -> PDB : SELECT Properties
+PDB --> R : Result
+
+R --> H : Property List
+H --> M : Result
+M --> PC : Result
+PC --> GW : Result
+GW --> Buyer : 200 OK + Properties
+
+' ===================================================
+== 4. Schedule Appointment (Buyer) ==
+
+Buyer -> GW : POST /api/appointments
+GW -> BC : Forward Request
+
+BC -> AM : Validate JWT
+AM --> BC : Authorized
+
+BC -> M : Send(CreateAppointmentCommand)
+M -> H : Handle Command
+
+H -> R : AddAppointment()
+R -> BDB : INSERT Appointment
+BDB --> R : Saved
+
+H -> NS : Notify Agent
+NS --> H : Sent
+
+H --> M : Result
+M --> BC : Result
+BC --> GW : Created
+GW --> Buyer : 201 Created
+
+' ===================================================
+== 5. Make Offer (Buyer) ==
+
+Buyer -> GW : POST /api/offers
+GW -> PC : Forward Request
+
+PC -> AM : Validate JWT
+AM --> PC : Authorized
+
+PC -> M : Send(CreateOfferCommand)
+M -> H : Handle Command
+
+H -> R : CheckPropertyStatus()
+R -> PDB : SELECT Status
+PDB --> R : Available
+
+H -> R : AddOffer()
+R -> PDB : INSERT Offer
+PDB --> R : Saved
+
+H -> NS : Notify Agent
+NS --> H : Sent
+
+H --> M : Result
+M --> PC : Result
+PC --> GW : Created
+GW --> Buyer : 201 Created
+
+' ===================================================
+== 6. Approve Offer (Agent) ==
+
+Agent -> GW : PUT /api/offers/{id}/accept
+GW -> PC : Forward Request
+
+PC -> AM : Validate JWT
+AM --> PC : Authorized
+
+PC -> M : Send(UpdateOfferStatusCommand)
+M -> H : Handle Command
+
+H -> R : UpdateOffer()
+R -> PDB : UPDATE Offer
+PDB --> R : Updated
+
+H -> NS : Notify Buyer
+NS --> H : Sent
+
+H --> M : Result
+M --> PC : Result
+PC --> GW : Success
+GW --> Agent : 200 OK
+
+' ===================================================
+== 7. Admin Approves Property ==
+
+Admin -> GW : PUT /api/properties/{id}/approve
+GW -> PC : Forward Request
+
+PC -> AM : Validate JWT
+AM --> PC : Authorized
+
+PC -> M : Send(UpdatePropertyStatusCommand)
+M -> H : Handle Command
+
+H -> R : UpdateProperty()
+R -> PDB : UPDATE Property
+PDB --> R : Updated
+
+H -> NS : Notify Agent
+NS --> H : Sent
+
+H --> M : Result
+M --> PC : Result
+PC --> GW : Success
+GW --> Admin : 200 OK
+
+@enduml

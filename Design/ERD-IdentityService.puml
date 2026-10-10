@@ -1,0 +1,48 @@
+@startuml
+title IdentityService - ERD
+
+entity RefSet {
+  +Id : INT <<PK>>
+  --
+  Key : VARCHAR(20)
+  Description : VARCHAR(50)
+}
+
+entity RefTerm {
+  +Id : INT <<PK>>
+  --
+  Key : VARCHAR(20)
+  Description : VARCHAR(50)
+}
+
+entity SetRefTerm {
+  +Id : INT <<PK>>
+  RefSetId : INT <<FK>>
+  RefTermId : INT <<FK>>
+}
+
+entity User {
+  +Id : INT <<PK>>
+  RoleId : INT <<FK>>
+
+  --
+
+  FirstName : VARCHAR(20)
+  LastName : VARCHAR(20)
+
+  Email : VARCHAR(20)
+  Phone : VARCHAR(10)
+
+  PasswordHash : VARCHAR(255)
+
+  DateCreated : DATETIME
+  IsActive : BOOLEAN
+}
+
+RefSet ||--o{ SetRefTerm
+RefTerm ||--o{ SetRefTerm
+
+RefTerm ||--o{ User : RoleId
+
+@enduml
+

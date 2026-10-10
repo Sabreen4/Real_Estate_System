@@ -1,0 +1,50 @@
+# Build outputs
+bin/
+obj/
+publish/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.cache
+*.csproj.user
+
+# Visual Studio Code
+.vscode/
+
+# JetBrains Rider
+.idea/
+
+# Logs
+*.log
+log/
+logs/
+
+# Test results
+TestResults/
+
+# Code coverage
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+*.opencover.xml
+*.lcov
+coverage-report/
+CoverageReport/
+# NuGet packages
+*.nupkg
+packages/
+
+# Configuration (hide all appsettings)
+appsettings*.json
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Misc
+*.swp
+*.tmp
+*.temp

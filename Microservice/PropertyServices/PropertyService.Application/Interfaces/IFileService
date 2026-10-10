@@ -1,0 +1,6 @@
+// namespace PropertyService.Application.Interfaces{
+//     public interface IFileService
+//     {
+//         Task<string> UploadFileAsync(byte[] content, string filename);
+//     }
+// }

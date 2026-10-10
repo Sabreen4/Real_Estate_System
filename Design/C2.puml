@@ -1,0 +1,42 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Real Estate Property Listing System - C2 Container Diagram (Microservices with Schemas)
+
+Person(admin, "Admin", "Approves listings and manages users")
+Person(agent, "Agent/Seller", "Creates and manages property listings")
+Person(buyer, "Buyer/Renter", "Searches properties and schedules visits")
+
+System_Boundary(realEstateSystem, "Real Estate Microservices System") {
+
+Container(apiGateway, "API Gateway", ".NET Core Web API + Ocelot","Routes incoming requests to appropriate microservices")
+
+Container(identityService, "Identity Service",".NET Core Web API","Handles authentication and user management\nSchema: Identity")
+
+Container(propertyService, "Property Service",".NET Core Web API","Handles properties, images, and offers\nSchema: Property")
+
+Container(bookingService, "Booking Service",".NET Core Web API","Handles appointments and transactions\nSchema: Booking")
+
+ContainerDb(mainDatabase,"Real Estate Database","SQL Server","Single Database with Schemas:\nIdentity\nProperty\nBooking")
+
+}
+
+Rel(admin, apiGateway, "Uses", "HTTPS/JSON")
+Rel(agent, apiGateway, "Uses", "HTTPS/JSON")
+Rel(buyer, apiGateway, "Uses", "HTTPS/JSON")
+
+Rel(apiGateway, identityService, "Routes requests", "HTTPS/REST")
+Rel(apiGateway, propertyService, "Routes requests", "HTTPS/REST")
+Rel(apiGateway, bookingService, "Routes requests", "HTTPS/REST")
+
+Rel(identityService, mainDatabase,"Reads/Writes Identity Schema","EF Core / SQL")
+
+Rel(propertyService, mainDatabase,"Reads/Writes Property Schema","EF Core / SQL")
+
+Rel(bookingService, mainDatabase,"Reads/Writes Booking Schema","EF Core / SQL")
+
+Rel(bookingService, propertyService,"Checks property availability","REST/HTTP")
+
+Rel(bookingService, identityService,"Validates user information","REST/HTTP")
+
+@enduml

@@ -1,0 +1,26 @@
+{
+  "SwaggerEndPoints": [
+    {
+      "Key": "identity",
+      "TransformByOcelotConfig": false,
+      "Config": [
+        {
+          "Name": "IdentityService",
+          "Version": "v1",
+          "Url": "http://localhost:5242/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "property",
+      "TransformByOcelotConfig": false,
+      "Config": [
+        {
+          "Name": "PropertyService",
+          "Version": "v1",
+          "Url": "http://localhost:5017/swagger/v1/swagger.json"
+        }
+      ]
+    }
+  ]
+}

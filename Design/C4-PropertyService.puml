@@ -1,0 +1,126 @@
+@startuml
+title PropertyService - CQRS Class Diagram (int IDs)
+
+class Property {
+    + int Id
+    + string Title
+    + string Description
+    + decimal Price
+    + string Location
+}
+
+class PropertyImage {
+    + int Id
+    + int PropertyId
+    + string ImageUrl
+}
+
+class Offer {
+    + int Id
+    + int PropertyId
+    + int BuyerId
+    + decimal OfferAmount
+}
+
+class PropertiesController {
+    - IMediator _mediator
+    + GetAll(GetAllPropertiesQuery query)
+    + GetById(GetPropertyQuery query)
+    + Create(CreatePropertyCommand command)
+    + Update(UpdatePropertyCommand command)
+    + Delete(DeletePropertyCommand command)
+}
+
+class PropertyImagesController {
+    - IMediator _mediator
+    + UploadImage(UploadImageCommand command)
+}
+
+class OffersController {
+    - IMediator _mediator
+    + CreateOffer(CreateOfferCommand command)
+}
+
+class GetAllPropertiesQuery {
+}
+
+class GetPropertyQuery {
+    + int PropertyId
+}
+
+class CreatePropertyCommand {
+    + string Title
+    + string Description
+    + decimal Price
+}
+
+class UpdatePropertyCommand {
+    + int PropertyId
+}
+
+class DeletePropertyCommand {
+    + int PropertyId
+}
+
+class UploadImageCommand {
+    + int PropertyId
+}
+
+class CreateOfferCommand {
+    + int PropertyId
+    + decimal OfferAmount
+}
+
+class GetPropertyQueryHandler {
+    - IPropertyRepository _repository
+    + Handle(GetPropertyQuery query)
+}
+
+class GetAllPropertiesQueryHandler {
+    - IPropertyRepository _repository
+    + Handle(GetAllPropertiesQuery query)
+}
+
+class CreatePropertyCommandHandler {
+    - IPropertyRepository _repository
+    + Handle(CreatePropertyCommand command)
+}
+
+class UpdatePropertyCommandHandler {
+    - IPropertyRepository _repository
+    + Handle(UpdatePropertyCommand command)
+}
+
+class DeletePropertyCommandHandler {
+    - IPropertyRepository _repository
+    + Handle(DeletePropertyCommand command)
+}
+
+class PropertyRepository {
+    - PropertyDbContext _context
+    + GetAll()
+    + GetById(int id)
+    + Add(Property property)
+    + Update(Property property)
+    + Delete(int id)
+}
+
+class PropertyDbContext {
+    + DbSet<Property> Properties
+    + DbSet<PropertyImage> PropertyImages
+    + DbSet<Offer> Offers
+}
+
+PropertiesController --> CreatePropertyCommand
+PropertiesController --> UpdatePropertyCommand
+PropertiesController --> DeletePropertyCommand
+
+GetPropertyQueryHandler --> PropertyRepository
+CreatePropertyCommandHandler --> PropertyRepository
+
+PropertyRepository --> PropertyDbContext
+
+Property --> PropertyImage
+Property --> Offer
+
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title Real Estate Property Listing System - C1 Context Diagram (Microservices)
+
+Person(admin, "Admin", "Approves property listings, manages users, and monitors transactions")
+
+Person(agent, "Agent/Seller", "Lists properties, manages inquiries, and updates property details")
+
+Person(buyer, "Buyer/Renter", "Browses properties, schedules visits, and makes offers")
+
+System(apiGateway, "API Gateway", "Single entry point that routes requests to microservices")
+
+System(realEstateSystem, "Real Estate Microservices System", "Handles property listing, user management, booking, and transactions using microservices")
+
+Rel(admin, apiGateway, "Uses system via browser or mobile")
+
+Rel(agent, apiGateway, "Uses system via browser or mobile")
+
+Rel(buyer, apiGateway, "Uses system via browser or mobile")
+
+Rel(apiGateway, realEstateSystem, "Routes requests to microservices")
+
+@enduml

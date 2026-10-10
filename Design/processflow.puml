@@ -1,0 +1,220 @@
+@startuml
+title Real Estate Microservices - Process Flow (With Notification Service)
+
+start
+
+:User enters email;
+
+if (User already registered?) then (Yes)
+
+  :User Login;
+  note right
+  IdentityService
+  POST /api/auth/login
+  200 OK / 401 Unauthorized
+  end note
+
+  if (Authenticated?) then (Yes)
+    :Proceed to System;
+  else (No)
+    :Show Invalid Credentials;
+    stop
+  endif
+
+else (No)
+
+  :User Registration;
+  note right
+  IdentityService
+  POST /api/auth/register
+  201 Created / 409 Conflict
+  end note
+
+  if (Registration Successful?) then (Yes)
+
+    :Send Welcome Email;
+    note right
+    NotificationService
+    POST /api/notifications/email
+    (User Registered)
+    end note
+
+    :Login after Registration;
+
+  else (No)
+
+    :User Already Exists Error;
+    stop
+
+  endif
+
+endif
+
+:Agent creates property listing;
+note right
+PropertyService
+POST /api/properties
+201 Created
+end note
+
+:Submit for Admin approval;
+
+:Admin reviews property;
+note right
+PropertyService
+PUT /api/properties/{id}/approve
+200 OK / 403 Forbidden
+end note
+
+if (Admin Approved?) then (Yes)
+
+  :Property Published & Visible;
+
+else (No)
+
+  :Notify Agent - Listing Rejected;
+  note right
+  NotificationService
+  Send Rejection Email
+  end note
+
+  stop
+
+endif
+
+:Buyer searches properties;
+note right
+PropertyService
+GET /api/properties?filters
+200 OK
+end note
+
+:Buyer views property details;
+
+:Schedule Visit;
+note right
+BookingService
+POST /api/appointments
+201 Created
+end note
+
+:Send Appointment Request Email;
+note right
+NotificationService
+Notify Agent
+end note
+
+:Agent reviews appointment request;
+note right
+BookingService
+PUT /api/appointments/{id}/status
+200 OK
+end note
+
+if (Agent Accepts Visit?) then (Yes)
+
+  :Visit Confirmed;
+
+  :Notify Buyer - Visit Confirmed;
+  note right
+  NotificationService
+  Send Confirmation Email
+  end note
+
+  :Buyer visits the property;
+
+else (No)
+
+  :Visit Declined;
+
+  :Notify Buyer - Visit Declined;
+  note right
+  NotificationService
+  Send Decline Email
+  end note
+
+  stop
+
+endif
+
+if (Buyer wants to make an offer?) then (Yes)
+
+  :Buyer submits offer;
+  note right
+  PropertyService
+  POST /api/offers
+  201 Created / 400 Bad Request
+  end note
+
+  :Notify Agent - New Offer;
+  note right
+  NotificationService
+  Send Offer Email
+  end note
+
+  :Agent reviews offer;
+  note right
+  PropertyService
+  PUT /api/offers/{id}/status
+  200 OK
+  end note
+
+  if (Offer Accepted?) then (Yes)
+
+    :Notify Buyer - Offer Accepted;
+    note right
+    NotificationService
+    Send Acceptance Email
+    end note
+
+    :Property marked as Under Offer;
+
+  else (No)
+
+    if (Counter Offer Made?) then (Yes)
+
+      :Agent sends Counter Offer amount;
+
+      :Notify Buyer - Counter Offer;
+      note right
+      NotificationService
+      Send Counter Offer Email
+      end note
+
+      if (Buyer accepts counter?) then (Yes)
+
+        :Counter Offer Accepted;
+
+        :Property marked as Under Offer;
+
+      else (No)
+
+        :Negotiation Ends;
+
+      endif
+
+    else (No)
+
+      :Notify Buyer - Offer Rejected;
+      note right
+      NotificationService
+      Send Rejection Email
+      end note
+
+    endif
+
+  endif
+
+else (No)
+
+  :Buyer exits without offer;
+  note right
+  Buyer may revisit
+  or search again
+  end note
+
+endif
+
+stop
+
+@enduml

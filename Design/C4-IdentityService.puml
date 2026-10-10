@@ -1,0 +1,84 @@
+@startuml
+title IdentityService - Class Diagram (Controller + Repository Pattern)
+
+class User {
+    + int Id
+    + string Name
+    + string Email
+    + string PasswordHash
+    + string Role
+    + DateTime CreatedAt
+}
+
+class LoginDto {
+    + string Email
+    + string Password
+}
+
+class RegisterDto {
+    + string Name
+    + string Email
+    + string Password
+}
+
+class AuthController {
+    - IAuthService _authService
+    + Login(LoginDto dto)
+    + Register(RegisterDto dto)
+}
+
+class UsersController {
+    - IUserRepository _userRepository
+    + GetUserById(int id)
+    + GetAllUsers()
+    + UpdateUser(int id)
+    + DeleteUser(int id)
+}
+
+class AuthService {
+    - IUserRepository _userRepository
+    - IJwtService _jwtService
+    + Login(LoginDto dto)
+    + Register(RegisterDto dto)
+}
+
+class JwtService {
+    - IConfiguration _configuration
+    + GenerateToken(User user)
+}
+
+class IUserRepository {
+    + GetById(int id)
+    + GetByEmail(string email)
+    + GetAll()
+    + Add(User user)
+    + Update(User user)
+    + Delete(int id)
+}
+
+class UserRepository {
+    - IdentityDbContext _context
+    + GetById(int id)
+    + GetByEmail(string email)
+    + GetAll()
+    + Add(User user)
+    + Update(User user)
+    + Delete(int id)
+}
+
+class IdentityDbContext {
+    + DbSet<User> Users
+}
+
+AuthController --> AuthService
+UsersController --> IUserRepository
+
+AuthService --> IUserRepository
+AuthService --> JwtService
+
+UserRepository --> IdentityDbContext
+
+UserRepository ..|> IUserRepository
+
+@enduml
+

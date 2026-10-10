@@ -1,0 +1,30 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title IdentityService - C3 Component Diagram (Controller-Service-Repository)
+
+Container(identityService, "IdentityService API", ".NET Core Web API")
+
+ContainerDb(identityDb, "Identity Database", "SQL Server\nSchema: Identity")
+
+Component(authController,"AuthController","API Controller","Handles login and registration requests")
+
+Component(userController,"UsersController","API Controller","Handles user management operations")
+
+Component(authService,"AuthService","Service Layer","Handles authentication logic and validation")
+
+Component(jwtService,"JwtService","Service","Generates JWT tokens")
+
+Component(userRepository,"UserRepository","Repository","Handles database operations using EF Core")
+
+Rel(authController, authService, "Calls")
+
+Rel(userController, userRepository, "Uses")
+
+Rel(authService, userRepository, "Validates User")
+
+Rel(authService, jwtService, "Generates JWT")
+
+Rel(userRepository, identityDb, "Reads/Writes")
+
+@enduml

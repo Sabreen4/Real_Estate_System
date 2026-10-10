@@ -1,0 +1,77 @@
+@startuml
+title BookingService - CQRS Class Diagram (int IDs)
+
+class Appointment {
+    + int Id
+    + int PropertyId
+    + int BuyerId
+    + DateTime AppointmentDate
+}
+
+class Transaction {
+    + int Id
+    + int PropertyId
+    + decimal Amount
+}
+
+class AppointmentsController {
+    - IMediator _mediator
+    + Create(CreateAppointmentCommand command)
+    + Get(GetAppointmentsQuery query)
+}
+
+class TransactionsController {
+    - IMediator _mediator
+    + Create(CreateTransactionCommand command)
+}
+
+class CreateAppointmentCommand {
+    + int PropertyId
+    + DateTime AppointmentDate
+}
+
+class GetAppointmentsQuery {
+    + int UserId
+}
+
+class CreateTransactionCommand {
+    + int PropertyId
+    + decimal Amount
+}
+
+class CreateAppointmentCommandHandler {
+    - IAppointmentRepository _repository
+    + Handle(CreateAppointmentCommand command)
+}
+
+class GetAppointmentsQueryHandler {
+    - IAppointmentRepository _repository
+    + Handle(GetAppointmentsQuery query)
+}
+
+class CreateTransactionCommandHandler {
+    - ITransactionRepository _repository
+    + Handle(CreateTransactionCommand command)
+}
+
+class BookingRepository {
+    - BookingDbContext _context
+    + AddAppointment(Appointment appointment)
+    + GetAppointments(int userId)
+    + AddTransaction(Transaction transaction)
+}
+
+class BookingDbContext {
+    + DbSet<Appointment> Appointments
+    + DbSet<Transaction> Transactions
+}
+
+AppointmentsController --> CreateAppointmentCommand
+TransactionsController --> CreateTransactionCommand
+
+CreateAppointmentCommandHandler --> BookingRepository
+CreateTransactionCommandHandler --> BookingRepository
+
+BookingRepository --> BookingDbContext
+
+@enduml

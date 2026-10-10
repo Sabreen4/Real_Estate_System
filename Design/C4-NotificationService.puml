@@ -1,0 +1,111 @@
+@startuml
+title NotificationService - Class Diagram (With Implements Label)
+
+' =========================
+' ENTITY
+' =========================
+
+class Notification {
+  +Id : int
+  +RecipientEmail : string
+  +Subject : string
+  +Message : string
+  +NotificationTypeId : int
+  +StatusId : int
+  +RelatedEntityId : int
+  +CreatedAt : DateTime
+  +SentAt : DateTime
+}
+
+' =========================
+' DTO
+' =========================
+
+class EmailRequestDto {
+  +ToEmail : string
+  +Subject : string
+  +Body : string
+}
+
+' =========================
+' INTERFACES
+' =========================
+
+interface IEmailService {
+  +SendEmailAsync(to : string, subject : string, body : string) : Task
+}
+
+interface INotificationService {
+  +SendNotificationAsync(dto : EmailRequestDto) : Task
+  +CreateNotificationAsync(notification : Notification) : Task
+  +UpdateStatusAsync(id : int, statusId : int) : Task
+}
+
+interface INotificationRepository {
+  +AddAsync(notification : Notification) : Task
+  +UpdateStatusAsync(id : int, statusId : int) : Task
+  +GetByIdAsync(id : int) : Task<Notification>
+}
+
+interface IIdentityApi {
+  +GetUserById(userId : int) : Task<UserDto>
+}
+
+' =========================
+' IMPLEMENTATION CLASSES
+' =========================
+
+class EmailService {
+  -smtpClient : SmtpClient
+  -configuration : IConfiguration
+
+  +SendEmailAsync(to : string, subject : string, body : string) : Task
+}
+
+class NotificationService {
+  -emailService : IEmailService
+  -notificationRepository : INotificationRepository
+  -identityApi : IIdentityApi
+
+  +SendNotificationAsync(dto : EmailRequestDto) : Task
+  +CreateNotificationAsync(notification : Notification) : Task
+  +UpdateStatusAsync(id : int, statusId : int) : Task
+}
+
+class NotificationRepository {
+  -dbContext : NotificationDbContext
+
+  +AddAsync(notification : Notification) : Task
+  +UpdateStatusAsync(id : int, statusId : int) : Task
+  +GetByIdAsync(id : int) : Task<Notification>
+}
+
+class NotificationController {
+  -notificationService : INotificationService
+
+  +SendEmail(dto : EmailRequestDto) : IActionResult
+}
+
+' =========================
+' RELATIONSHIPS
+' =========================
+
+NotificationController --> INotificationService
+
+NotificationService --> IEmailService
+NotificationService --> INotificationRepository
+NotificationService --> IIdentityApi
+
+NotificationRepository --> Notification
+
+' =========================
+' IMPLEMENTATION ARROWS
+' =========================
+
+IEmailService <|.. EmailService : implements
+
+INotificationService <|.. NotificationService : implements
+
+INotificationRepository <|.. NotificationRepository : implements
+
+@enduml

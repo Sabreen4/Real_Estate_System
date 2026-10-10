@@ -1,0 +1,42 @@
+@startuml
+title NotificationService - ERD (With Ref Tables)
+
+entity RefSet {
+  +Id : INT <<PK>>
+  --
+  Key : VARCHAR(20)
+  Description : VARCHAR(20)
+}
+
+entity RefTerm {
+  +Id : INT <<PK>>
+  --
+  Key : VARCHAR(20)
+  Description : VARCHAR(20)
+}
+
+entity SetRefTerm {
+  +Id : INT <<PK>>
+  --
+  RefSetId : INT <<FK>>
+  RefTermId : INT <<FK>>
+}
+
+entity Notification {
+  +Id : INT <<PK>>
+  --
+  RecipientEmail : VARCHAR(20)
+  Subject : VARCHAR(20)
+  Message : TEXT
+  StatusId : INT <<FK>>
+  CreatedAt : DATETIME
+  SentAt : DATETIME
+}
+
+RefSet ||--o{ SetRefTerm
+RefTerm ||--o{ SetRefTerm
+
+SetRefTerm ||--o{ Notification : Status
+
+@enduml
+

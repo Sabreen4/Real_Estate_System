@@ -1,0 +1,35 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title BookingService - C3 Component Diagram
+
+Container(bookingService, "BookingService API", ".NET Core Web API")
+ContainerDb(bookingDb, "Booking Database", "SQL Server")
+
+Component(appointmentController, "AppointmentsController", "API Controller")
+
+Component(transactionController, "TransactionsController", "API Controller")
+
+Component(createAppointmentCommand, "CreateAppointmentCommandHandler", "Command Handler")
+
+Component(getAppointmentsQuery, "GetAppointmentsQueryHandler", "Query Handler")
+
+Component(createTransactionCommand, "CreateTransactionCommandHandler", "Command Handler")
+
+Component(bookingRepository, "Booking Repository", "EF Core Repository")
+
+Rel(appointmentController, createAppointmentCommand, "Calls")
+
+Rel(appointmentController, getAppointmentsQuery, "Calls")
+
+Rel(transactionController, createTransactionCommand, "Calls")
+
+Rel(createAppointmentCommand, bookingRepository, "Writes")
+
+Rel(getAppointmentsQuery, bookingRepository, "Reads")
+
+Rel(createTransactionCommand, bookingRepository, "Writes")
+
+Rel(bookingRepository, bookingDb, "Reads/Writes")
+
+@enduml
