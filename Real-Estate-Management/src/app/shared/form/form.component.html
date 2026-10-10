@@ -1,0 +1,89 @@
+<!-- Shared reusable user fields — no modal wrapper -->
+
+<!-- FIRST + LAST -->
+<div class="form-row">
+  <div class="form-group">
+    <label>First Name</label>
+    <input type="text" name="firstName"
+           [(ngModel)]="data.firstName"
+           required #fn="ngModel"
+           placeholder="First name" />
+    <span class="field-error" *ngIf="fn.invalid && fn.touched">Required</span>
+  </div>
+
+  <div class="form-group">
+    <label>Last Name</label>
+    <input type="text" name="lastName"
+           [(ngModel)]="data.lastName"
+           required #ln="ngModel"
+           placeholder="Last name" />
+    <span class="field-error" *ngIf="ln.invalid && ln.touched">Required</span>
+  </div>
+</div>
+
+<!-- EMAIL + PHONE -->
+<div class="form-row">
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" name="email"
+           [(ngModel)]="data.email"
+           required email #em="ngModel"
+           placeholder="email@example.com" />
+    <span class="field-error" *ngIf="em.invalid && em.touched">Valid email required</span>
+  </div>
+
+  <div class="form-group">
+    <label>Phone</label>
+    <input type="tel" name="phone"
+           [(ngModel)]="data.phone"
+           required #ph="ngModel"
+           placeholder="+91 00000 00000" />
+    <span class="field-error" *ngIf="ph.invalid && ph.touched">Required</span>
+  </div>
+</div>
+
+<!-- PASSWORD + CONFIRM -->
+<div class="form-row">
+  <div class="form-group">
+    <label>Password</label>
+    <div class="pw-wrap">
+      <input [type]="showPassword ? 'text' : 'password'"
+             name="password"
+             [(ngModel)]="data.password"
+             required minlength="6" #pw="ngModel"
+             placeholder="Min 6 characters" />
+      <span class="pw-toggle" (click)="showPassword = !showPassword">
+        {{ showPassword ? 'Hide' : 'Show' }}
+      </span>
+    </div>
+    <span class="field-error" *ngIf="pw.invalid && pw.touched">Min 6 characters</span>
+  </div>
+
+  <div class="form-group">
+    <label>Confirm Password</label>
+    <div class="pw-wrap">
+      <input [type]="showConfirmPassword ? 'text' : 'password'"
+             name="confirmPassword"
+             [(ngModel)]="data.confirmPassword"
+             required #cpw="ngModel"
+             placeholder="Repeat password" />
+      <span class="pw-toggle" (click)="showConfirmPassword = !showConfirmPassword">
+        {{ showConfirmPassword ? 'Hide' : 'Show' }}
+      </span>
+    </div>
+    <span class="field-error"
+          *ngIf="data.confirmPassword && data.password !== data.confirmPassword">
+      Passwords don't match
+    </span>
+  </div>
+</div>
+
+<!-- ROLE (hidden when roles list is empty) -->
+<div class="form-group" *ngIf="roles.length">
+  <label>Role</label>
+  <select name="role" [(ngModel)]="data.role" required #rl="ngModel">
+    <option value="">Select role</option>
+    <option *ngFor="let r of roles" [value]="r">{{ r | titlecase }}</option>
+  </select>
+  <span class="field-error" *ngIf="rl.invalid && rl.touched">Required</span>
+</div>

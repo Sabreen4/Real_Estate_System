@@ -1,0 +1,59 @@
+<div class="lb-overlay" *ngIf="visible" (click)="close()">
+  <div class="lb-shell" (click)="$event.stopPropagation()">
+
+    <!-- Close -->
+    <button class="lb-close" (click)="close()" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6"  x2="6"  y2="18"/>
+        <line x1="6"  y1="6"  x2="18" y2="18"/>
+      </svg>
+    </button>
+
+    <!-- Counter -->
+    <div class="lb-counter" *ngIf="images.length > 1">
+      {{ currentIndex + 1 }} / {{ images.length }}
+    </div>
+
+    <!-- Image area -->
+    <div class="lb-img-area">
+      <!-- Prev -->
+      <button class="lb-arrow lb-arrow--prev"
+              *ngIf="images.length > 1"
+              (click)="prev()"
+              aria-label="Previous">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+
+      <!-- Image -->
+      <img class="lb-img"
+           [src]="images[currentIndex]"
+           alt="Image {{ currentIndex + 1 }} of {{ images.length }}">
+
+      <!-- Next -->
+      <button class="lb-arrow lb-arrow--next"
+              *ngIf="images.length > 1"
+              (click)="next()"
+              aria-label="Next">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Dots -->
+    <div class="lb-dots" *ngIf="images.length > 1">
+      <button class="lb-dot"
+              *ngFor="let img of images; let i = index"
+              [class.lb-dot--active]="i === currentIndex"
+              (click)="goTo(i)"
+              [attr.aria-label]="'Image ' + (i + 1)">
+      </button>
+    </div>
+
+  </div>
+</div>

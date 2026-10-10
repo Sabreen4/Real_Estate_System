@@ -1,0 +1,83 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 30px;
+
+  background-color: #1e293b;
+  color: white;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo {
+  margin-right: 20px;
+}
+
+.nav-left a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-right {
+  position: relative;
+}
+
+.profile-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.profile-dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 40px;
+  right: 0;
+
+  background-color: white;
+  color: black;
+
+  min-width: 150px;
+
+  border-radius: 8px;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+  overflow: hidden;
+}
+
+.dropdown-menu a,
+.dropdown-menu button {
+
+  display: block;
+  width: 100%;
+
+  padding: 12px 16px;
+
+  border: none;
+  background: none;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+  background-color: #f1f5f9;
+}

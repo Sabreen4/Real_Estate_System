@@ -1,0 +1,82 @@
+/* =====================================================
+   STATUS BADGE — shared component
+   Supports three badge types:
+     type="role"    → admin / agent / buyer
+     type="listing" → for sale / for rent / lease
+     type="status"  → active / sold / pending / rented / inactive
+===================================================== */
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.625rem;
+  border-radius: 1.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ── Role badges ── */
+.badge-admin {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-agent {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-buyer {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+/* ── Listing-type badges ── */
+.badge-sale {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.badge-rent {
+  background: rgba(217, 119, 6, 0.1);
+  color: #d97706;
+}
+
+.badge-lease {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+}
+
+/* ── Property-status badges ── */
+.status-active {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+}
+
+.status-sold {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+.status-pending {
+  background: rgba(217, 119, 6, 0.1);
+  color: #d97706;
+}
+
+.status-rented {
+  background: rgba(99, 102, 241, 0.1);
+  color: #4f46e5;
+}
+
+.status-inactive {
+  background: rgba(138, 145, 168, 0.1);
+  color: #64748b;
+}
+
+/* ── Fallback ── */
+.badge-default {
+  background: #f3f4f6;
+  color: #374151;
+}

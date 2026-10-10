@@ -1,0 +1,74 @@
+<div class="page">
+ <!-- <div class="back-nav">
+  <app-back-button></app-back-button>
+</div> -->
+  <div class="page-header">
+   
+    <h2>Buyer Offers</h2>
+    <p>Manage property purchase offers</p>
+  </div>
+
+  <div class="summary">
+    <div>{{ offers.length }} Offers</div>
+    <div class="pending" *ngIf="pendingOffers > 0">
+      {{ pendingOffers }} Pending
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div class="empty" *ngIf="isLoading">Loading…</div>
+
+  <!-- EMPTY -->
+  <div class="empty" *ngIf="!isLoading && offers.length === 0">
+    No offers yet
+  </div>
+
+  <!-- LIST -->
+  <div class="list" *ngIf="!isLoading && offers.length > 0">
+    <div class="card" *ngFor="let o of pagedOffers">
+
+      <div class="price">
+        {{ formatPrice(o.offerAmount) }}
+      </div>
+
+      <div class="info">
+        <div class="title" [title]="o.propertyName">{{ o.propertyName }}</div>
+        <div class="sub"   [title]="o.buyerName">Buyer: {{ o.buyerName }}</div>
+        <div class="meta">
+          <span class="email" [title]="o.buyerEmail">{{ o.buyerEmail }}</span>
+          <span class="status" [ngClass]="getStatusClass(o.status)">
+            {{ getStatusLabel(o.status) }}
+          </span>
+        </div>
+        <div class="note" *ngIf="o.message" [title]="o.message">{{ o.message }}</div>
+      </div>
+
+      <div class="actions">
+        <button class="reject"
+                *ngIf="isPending(o.status)"
+                (click)="updateOffer(o.id, 'REJECTED')">
+          Decline
+        </button>
+        <button class="approve"
+                *ngIf="isPending(o.status)"
+                (click)="updateOffer(o.id, 'APPROVED')">
+          Accept
+        </button>
+        <span *ngIf="!isPending(o.status)" class="done">
+          {{ getStatusLabel(o.status) }}
+        </span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── PAGINATION ── -->
+<!-- ── PAGINATION ── -->
+<div class="pagination-row">
+  <app-back-button></app-back-button>
+  <app-paginator 
+    [currentPage]="currentPage" 
+    [totalPages]="totalPages" 
+    (pageChange)="goToPage($event)">
+  </app-paginator>
+</div>

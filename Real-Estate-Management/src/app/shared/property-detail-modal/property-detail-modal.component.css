@@ -1,0 +1,312 @@
+/* =====================================================
+   OVERLAY & MODAL SHELL
+===================================================== */
+.pdm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: pdmFadeIn .2s ease;
+}
+
+.pdm-modal {
+  width: 100%;
+  max-width: 620px;
+  max-height: 88vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #fff;
+  border-radius: 20px;
+  position: relative;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, .32);
+  animation: pdmSlideUp .25s ease;
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+  clip-path: inset(0 round 20px);
+}
+
+.pdm-modal::-webkit-scrollbar { width: 4px; }
+.pdm-modal::-webkit-scrollbar-track { background: transparent; }
+.pdm-modal::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 999px;
+}
+
+/* ── CLOSE BUTTON ──────────────────────────────────── */
+.pdm-close {
+  position: absolute;
+  top: .85rem;
+  right: .85rem;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .92);
+  font-size: .95rem;
+  cursor: pointer;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
+  transition: transform .2s;
+}
+.pdm-close:hover { transform: rotate(90deg); }
+
+/* =====================================================
+   CAROUSEL
+===================================================== */
+.pdm-carousel {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+  background: #111827;
+  border-radius: 20px 20px 0 0;
+}
+
+/* No-image state */
+.pdm-no-img {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: .6rem;
+  color: #9ca3af;
+  font-size: .85rem;
+}
+
+/* Slide wrapper */
+.pdm-slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Individual slide */
+.pdm-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .5s ease;
+}
+.pdm-slide-active {
+  opacity: 1;
+}
+
+.pdm-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Status badge */
+.pdm-status-badge {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+  background: #16a34a;
+  color: #fff;
+  padding: .42rem .85rem;
+  border-radius: 999px;
+  font-size: .71rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  z-index: 5;
+}
+
+/* Image counter */
+.pdm-counter {
+  position: absolute;
+  top: 1rem;
+  right: 3.2rem;
+  background: rgba(0,0,0,.5);
+  color: #fff;
+  font-size: .72rem;
+  padding: .3rem .7rem;
+  border-radius: 999px;
+  z-index: 5;
+}
+
+/* ── ARROWS ───────────────────────────────────────── */
+.pdm-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .85);
+  color: #111827;
+  cursor: pointer;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .2s, transform .2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.pdm-arrow:hover {
+  background: #fff;
+  transform: translateY(-50%) scale(1.08);
+}
+.pdm-arrow-prev { left: .75rem; }
+.pdm-arrow-next { right: .75rem; }
+
+/* ── DOTS ─────────────────────────────────────────── */
+.pdm-dots {
+  position: absolute;
+  bottom: .75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: .4rem;
+  z-index: 6;
+}
+.pdm-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,.45);
+  cursor: pointer;
+  transition: background .25s, transform .25s;
+  padding: 0;
+}
+.pdm-dot-active {
+  background: #fff;
+  transform: scale(1.25);
+}
+
+/* =====================================================
+   CONTENT
+===================================================== */
+.pdm-content {
+  padding: 1.4rem 1.6rem 1.8rem;
+}
+
+/* Top row */
+.pdm-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.pdm-type-pill {
+  display: inline-block;
+  background: #eff6ff;
+  color: #005ca8;
+  padding: .34rem .8rem;
+  border-radius: 999px;
+  font-size: .71rem;
+  font-weight: 700;
+  margin-bottom: .55rem;
+  letter-spacing: .03em;
+}
+
+.pdm-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: .35rem;
+  line-height: 1.3;
+}
+
+.pdm-location {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  color: #6b7280;
+  font-size: .88rem;
+}
+
+.pdm-price {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #005ca8;
+  white-space: nowrap;
+  padding-top: .3rem;
+}
+
+/* Detail grid */
+.pdm-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: .75rem;
+  margin-bottom: 1.25rem;
+}
+
+.pdm-detail-box {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: .75rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+}
+
+.pdm-detail-label {
+  font-size: .71rem;
+  color: #6b7280;
+}
+
+.pdm-detail-value {
+  font-size: .9rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Description */
+.pdm-description-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: .55rem;
+}
+
+.pdm-description-text {
+  line-height: 1.8;
+  color: #4b5563;
+  font-size: .9rem;
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+@keyframes pdmFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pdmSlideUp {
+  from { opacity: 0; transform: translateY(28px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);   }
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media (max-width: 768px) {
+  .pdm-modal {
+    max-height: 92vh;
+    border-radius: 16px;
+    clip-path: inset(0 round 16px);
+  }
+  .pdm-carousel  { height: 190px; border-radius: 16px 16px 0 0; }
+  .pdm-content   { padding: 1rem 1.1rem 1.3rem; }
+  .pdm-top-row   { flex-direction: column; }
+  .pdm-title     { font-size: 1.15rem; }
+  .pdm-price     { font-size: 1.2rem; }
+}

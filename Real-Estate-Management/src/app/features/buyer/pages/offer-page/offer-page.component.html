@@ -1,0 +1,134 @@
+<div class="page-wrapper">
+  <!-- <div class="back-nav">
+  <app-back-button></app-back-button>
+</div> -->
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-icon green-icon">₹</div>
+      <div>
+      
+
+        <h2 class="page-title">My Offers</h2>
+        <p class="page-sub">Offers you have submitted to agents</p>
+      </div>
+    </div>
+    <div class="page-header-right">
+      <button class="btn-refresh" (click)="load()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10" />
+          <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10" />
+        </svg>
+        Refresh
+      </button>
+      <button class="btn-browse" (click)="goToDashboard()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+        Browse Properties
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="tab-loading" *ngIf="isLoading">
+    <div class="tab-spinner"></div>
+    <span>Loading offers…</span>
+  </div>
+
+  <!-- EMPTY -->
+  <div class="tab-empty" *ngIf="!isLoading && myOffers.length === 0">
+    <div class="te-icon green-bg">₹</div>
+    <h4>No offers yet</h4>
+    <p>Browse properties and click <strong>Make Offer</strong> to submit your price</p>
+    <button class="te-cta green-btn" (click)="goToDashboard()">Browse Properties</button>
+  </div>
+
+  <!-- OFFERS LIST -->
+  <div class="tab-cards" *ngIf="!isLoading && myOffers.length > 0">
+
+    <div class="tc-offer" *ngFor="let o of pagedOffers">
+
+      <!-- AMOUNT BLOCK -->
+      <div class="tc-amount-block">
+        <span class="tc-amount-label">Your Offer</span>
+        <span class="tc-amount-value">₹ {{ o.offerAmount | number }}</span>
+      </div>
+
+      <!-- INFO -->
+      <div class="tc-info">
+        <div class="tc-title">
+          {{ o.propertyTitle || ('Property #' + o.propertyId) }}
+        </div>
+        <div class="tc-meta">₹ {{ o.offerAmount | number }}</div>
+        <div class="tc-meta" *ngIf="o.message">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+          </svg>
+          "{{ o.message }}"
+        </div>
+        <div class="tc-meta muted" *ngIf="o.createdAt">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          {{ o.createdAt | date:'dd MMM yyyy, h:mm a' }}
+        </div>
+      </div>
+
+      <!-- RIGHT: STATUS + ACTION -->
+      <div class="tc-right">
+
+        <!-- OFFER STATUS BADGE -->
+        <span class="ts-badge" [ngClass]="getStatusClass(o.status)">
+          {{ o.status || 'PENDING' }}
+        </span>
+
+        <!-- PAY NOW: only if APPROVED and not yet paid -->
+        <button
+          class="tc-pay-btn"
+          *ngIf="o.status === 'APPROVED' && o.paymentStatus !== 'COMPLETED' && o.propertyStatus !== 'SOLD'"
+          (click)="openPaymentModal(o)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" />
+            <line x1="1" y1="10" x2="23" y2="10" />
+          </svg>
+          Pay Now
+        </button>
+
+        <!-- PAID BADGE -->
+        <span
+          class="ts-badge ts-approved"
+          *ngIf="o.paymentStatus === 'COMPLETED' || o.propertyStatus === 'SOLD'">
+          ✓ Paid
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- PAGINATION — only when offers exceed one page -->
+  <!-- PAGINATION -->
+<div class="pagination-row" *ngIf="!isLoading && totalPages > 1">
+  <app-back-button></app-back-button>
+  <app-paginator
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    (pageChange)="goToPage($event)">
+  </app-paginator>
+</div>
+  <!-- PAYMENT MODAL -->
+  <app-payment
+    *ngIf="showPaymentModal && selectedProperty"
+    [property]="selectedProperty"
+    [offerId]="pendingOfferId"
+    [offerAmount]="pendingOfferAmount"
+    (closed)="onPaymentClosed()"
+    (paymentSuccess)="onPaymentSuccess($event)">
+  </app-payment>
+
+</div>

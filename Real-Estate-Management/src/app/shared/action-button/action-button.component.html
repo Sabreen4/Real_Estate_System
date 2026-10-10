@@ -1,0 +1,8 @@
+<div class="actions-inner">
+  <button class="btn-edit" (click)="editClicked.emit()" [disabled]="editDisabled">
+    <mat-icon>edit</mat-icon> {{ editLabel }}
+  </button>
+  <button class="btn-delete" (click)="deleteClicked.emit()" [disabled]="deleteDisabled">
+    <mat-icon>delete</mat-icon> {{ deleteLabel }}
+  </button>
+</div>

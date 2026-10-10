@@ -1,0 +1,200 @@
+<!-- BACKDROP -->
+<!-- TOAST CONTAINER -->
+<div class="toast-container">
+  <div *ngFor="let t of toasts" class="toast" [class.toast-success]="t.type === 'success'"
+    [class.toast-error]="t.type === 'error'">
+    <span class="toast-icon" *ngIf="t.type === 'success'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </svg>
+    </span>
+    <span class="toast-icon" *ngIf="t.type === 'error'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2.5">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="12" />
+        <line x1="12" y1="16" x2="12.01" y2="16" />
+      </svg>
+    </span>
+    <span class="toast-msg">{{ t.message }}</span>
+    <button class="toast-close" (click)="dismissToast(t)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div class="backdrop" (click)="close()"></div>
+
+<!-- MODAL -->
+<div class="modal">
+
+  <!-- SUCCESS STATE -->
+  <div class="success-state" *ngIf="isSuccess">
+    <div class="success-ring">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+        <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+        <polyline points="22 4 12 14.01 9 11.01" />
+      </svg>
+    </div>
+    <h4>Appointment Requested!</h4>
+    <p>
+      Your visit for <strong>{{ property?.title }}</strong> on
+      <strong>{{ formatDate(scheduledDate) }}</strong> at <strong>{{ scheduledTime }}</strong>
+      has been submitted.<br>The agent will confirm and you'll be notified by email.
+    </p>
+    <button class="btn-primary" (click)="onDone()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12" />
+      </svg>
+      Done
+    </button>
+  </div>
+
+  <!-- FORM STATE -->
+  <ng-container *ngIf="!isSuccess">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      </div>
+      <div class="header-text">
+        <h3>Book a Property Visit</h3>
+        <p>Schedule a visit — agent will confirm by email</p>
+      </div>
+      <button class="close-btn" (click)="close()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Property Banner -->
+    <div class="property-banner" *ngIf="property">
+      <div class="property-thumb">
+        <img *ngIf="property.imageUrl" [src]="property.imageUrl" [alt]="property.title">
+        <div class="thumb-placeholder" *ngIf="!property.imageUrl">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+        </div>
+      </div>
+      <div class="property-info">
+        <div class="property-name">{{ property.title }}</div>
+        <div class="property-loc">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          {{ property.city }}, {{ property.state }}
+        </div>
+        <div class="property-price">{{ formatPrice(property.price) }}</div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <div class="error-box" *ngIf="errorMsg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        {{ errorMsg }}
+      </div>
+
+      <p class="section-label">Select Visit Date &amp; Time</p>
+
+      <div class="date-time-grid">
+
+        <!-- ✅ CUSTOM DATE PICKER — replaces native <input type="date"> -->
+        <div class="field-group">
+          <label>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            Visit Date <span class="req">*</span>
+          </label>
+          <app-date-picker [(value)]="scheduledDate" [minDate]="getMinDate()" (valueChange)="onDateChange($event)">
+          </app-date-picker>
+
+          <!-- Show warning only if ALL slots on selected date are taken -->
+          <p class="slots-loading" *ngIf="scheduledDate && isDateFullyBooked(scheduledDate)"
+            style="color:#ef4444; font-size:0.75rem; margin-top:0.25rem;">
+            ⚠ All time slots on this date are booked. Please pick another date.
+          </p>
+        </div>
+
+        <!-- Time input stays unchanged -->
+        <div class="field-group">
+          <label>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12 6 12 12 16 14" />
+            </svg>
+            Visit Time <span class="req">*</span>
+          </label>
+          <app-time-picker [(value)]="scheduledTime">
+          </app-time-picker>
+        </div>
+
+      </div>
+
+      <!-- Quick Time Slots -->
+      <!-- Quick Time Slots -->
+      <div class="quick-times">
+        <span class="qt-label">Quick pick:</span>
+
+        <ng-container *ngFor="let t of quickTimes">
+          <button class="qt-btn" [class.qt-active]="selectedQuickTime === t"
+            [class.qt-booked]="isSlotBooked(scheduledDate, t)" [disabled]="isSlotBooked(scheduledDate, t)"
+            (click)="setQuickTime(t)">
+            {{ t }}
+            <span class="qt-booked-label" *ngIf="isSlotBooked(scheduledDate, t)">Booked</span>
+          </button>
+        </ng-container>
+      </div>
+
+      <div class="info-note">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        The agent will review your request and confirm via email. Mon–Sat visits only.
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-ghost" (click)="close()">Cancel</button>
+      <button class="btn-primary" (click)="book()" [disabled]="isSubmitting">
+        <svg *ngIf="!isSubmitting" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span class="spinner" *ngIf="isSubmitting"></span>
+        <span>{{ isSubmitting ? 'Booking…' : 'Confirm Booking' }}</span>
+      </button>
+    </div>
+
+  </ng-container>
+</div>

@@ -1,0 +1,25 @@
+<div class="modal-overlay" *ngIf="visible" (click)="cancelled.emit()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+
+    <div class="modal-header delete-header">
+      <div class="delete-icon-wrap">🗑</div>
+      <div>
+        <h2 class="modal-title">{{ title }}</h2>
+        <span class="modal-sub">This action cannot be undone.</span>
+      </div>
+      <button class="modal-close" (click)="cancelled.emit()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <p class="delete-confirm-text" [innerHTML]="description"></p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cancelled.emit()">Cancel</button>
+      <button class="btn-danger" (click)="confirmed.emit()" [disabled]="isLoading">
+        {{ isLoading ? 'Deleting…' : confirmLabel }}
+      </button>
+    </div>
+
+  </div>
+</div>

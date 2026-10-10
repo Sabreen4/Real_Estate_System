@@ -1,0 +1,314 @@
+<div class="buyer-dashboard">
+
+  <!-- HERO SECTION -->
+  <div class="hero-section">
+    <div class="hero-bg-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span class="tag-dot"></span>
+        Premium Real Estate Platform
+      </div>
+      <h1 class="hero-title">Find Your <span class="hero-accent">Dream</span> Property</h1>
+      <p class="hero-subtitle">Discover handpicked apartments, villas, and commercial spaces across India</p>
+
+      <app-searchbar [location]="location" [selectedType]="selectedType" [listingType]="listingType"
+        [minPrice]="minPrice" [maxPrice]="maxPrice" [resultCount]="properties.length" [hideStatus]="true"
+        (search)="onSearch($event)" (clear)="onClear()">
+      </app-searchbar>
+
+      <div class="hero-stats">
+        <div class="stat-item"><span class="stat-num">2,400+</span><span class="stat-label">Properties</span></div>
+        <div class="stat-sep"></div>
+        <div class="stat-item"><span class="stat-num">120+</span><span class="stat-label">Cities</span></div>
+        <div class="stat-sep"></div>
+        <div class="stat-item"><span class="stat-num">98%</span><span class="stat-label">Satisfied Buyers</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD BODY -->
+  <div class="dashboard-body">
+    <div class="tab-content">
+
+      <!-- SECTION HEADER -->
+      <div class="section-header">
+        <h2 class="section-title">Featured Properties</h2>
+        <p class="section-sub">Browse our latest listings</p>
+      </div>
+
+      <!-- LOADER -->
+      <div class="loader-wrapper" *ngIf="isLoading">
+        <div class="spinner"></div>
+        <p class="loader-text">Fetching properties...</p>
+      </div>
+
+      <!-- EMPTY -->
+      <app-empty-state *ngIf="!isLoading && properties.length === 0" icon="🏠" title="No properties found"
+        subtitle="Try adjusting your search filters">
+      </app-empty-state>
+
+      <!-- PROPERTY GRID -->
+      <div class="property-grid" *ngIf="!isLoading && properties.length > 0">
+        <ng-container *ngFor="let property of properties; let i = index">
+          <div class="property-card" *ngIf="property.status.toUpperCase() === 'ACTIVE'"
+            [style.animation-delay]="(i * 80) + 'ms'">
+
+            <div class="card-image-wrap">
+              <img [src]="property?.imageUrl" alt="{{ property.title }}" class="card-image clickable-image"
+                (click)="openPropertyDetails(property)" />
+              <div class="card-badge badge-active">
+                <span class="badge-dot"></span>
+                {{ property.status }}
+              </div>
+              <div class="listing-tag">{{ property.listingType }}</div>
+            </div>
+
+            <div class="card-body">
+              <div class="card-meta-row">
+                <span class="card-type-pill">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                  </svg>
+                  {{ property.propertyType }}
+                </span>
+                <span class="card-size">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                  </svg>
+                  {{ property.size }} sqft
+                </span>
+              </div>
+
+              <h3 class="card-title">{{ property.title }}</h3>
+
+              <p class="card-location">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                {{ property.city }}, {{ property.state }}
+              </p>
+
+              <p class="card-desc">{{ property.description }}</p>
+
+              <div class="card-footer">
+                <div class="card-price">
+                  <span class="price-label">Price</span>
+                  <span class="price-value">₹ {{ property.price | number }}</span>
+                </div>
+                <div class="card-actions-row">
+                  <button class="card-action-btn appt-btn" (click)="bookVisitFromCard(property)" title="Book Appointment">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </button>
+                  <button class="card-action-btn offer-btn" (click)="makeOfferFromCard(property)" title="Make Offer">₹</button>
+                  <button class="card-action-btn buy-btn" (click)="openDirectPaymentModal(property)" title="Buy Now">
+                    <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="5" y="13" width="38" height="25" rx="5" stroke="#1D4ED8" stroke-width="2.5" />
+                      <line x1="5" y1="21" x2="43" y2="21" stroke="#1D4ED8" stroke-width="2.5" />
+                      <path d="M36 8 L43 13 L36 18" fill="none" stroke="#1D4ED8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <path d="M12 30 L5 35 L12 40" fill="none" stroke="#1D4ED8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- MY OFFERS TAB -->
+      <div *ngIf="activeTab === 'offers'">
+        <div class="tab-section-header">
+          <div class="tsh-icon tsh-green">₹</div>
+          <div>
+            <p class="tsh-title">My Offers</p>
+            <p class="tsh-sub">Track your submitted offers</p>
+          </div>
+          <button class="tsh-refresh" (click)="loadMyOffers()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10" />
+              <polyline points="1 20 1 14 7 14" />
+              <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
+
+        <div class="tab-loading" *ngIf="isLoadingTab">
+          <div class="tab-spinner green"></div> Loading offers...
+        </div>
+
+        <div class="tab-empty" *ngIf="!isLoadingTab && myOffers.length === 0">
+          <div class="te-icon green-bg">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <line x1="12" y1="1" x2="12" y2="23" />
+              <path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" />
+            </svg>
+          </div>
+          <h4>No offers yet</h4>
+          <p>Browse properties and submit an offer to get started</p>
+        </div>
+
+        <div class="tab-cards" *ngIf="!isLoadingTab && myOffers.length > 0">
+          <div class="tc-offer" *ngFor="let offer of myOffers">
+            <div class="tc-amount-block">
+              <span class="tc-amount-label">Offer</span>
+              <span class="tc-amount-value">₹ {{ offer.offerAmount | number }}</span>
+            </div>
+            <div class="tc-info">
+              <div class="tc-title">{{ offer.propertyTitle || 'Property #' + offer.propertyId }}</div>
+              <div class="tc-meta">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                {{ offer.city || '—' }}
+              </div>
+              <div class="tc-meta muted" *ngIf="offer.message">{{ offer.message }}</div>
+            </div>
+            <div class="tc-right">
+              <span class="ts-badge" [ngClass]="getOfferStatusClass(offer.status)">
+                {{ offer.status || 'PENDING' }}
+              </span>
+              <button class="tc-pay-btn" *ngIf="offer.status.toUpperCase() === 'APPROVED'" (click)="payApprovedOffer(offer)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" />
+                  <line x1="1" y1="10" x2="23" y2="10" />
+                </svg>
+                Pay Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- APPOINTMENT MODAL -->
+      <app-appointment *ngIf="showAppointmentModal && selectedProperty" [property]="selectedProperty"
+        (closed)="onAppointmentClosed()" (booked)="onAppointmentClosed()">
+      </app-appointment>
+
+      <!-- PROPERTY DETAILS MODAL -->
+      <div class="property-modal-overlay" *ngIf="showPropertyModal && selectedProperty"
+        (click)="closePropertyDetails()">
+        <div class="property-modal" (click)="$event.stopPropagation()">
+
+          <button class="property-modal-close" (click)="closePropertyDetails()">✕</button>
+
+          <!-- IMAGE SLIDER -->
+          <div class="property-modal-image-wrap">
+
+            <div class="modal-slider-track"
+                 [style.transform]="'translateX(-' + modalSliderIndex * 100 + '%)'">
+
+              <ng-container *ngIf="modalImages.length > 0">
+                <div class="modal-slider-slide" *ngFor="let img of modalImages; let i = index">
+                  <img [src]="img" [alt]="selectedProperty.title + ' image ' + (i + 1)">
+                </div>
+              </ng-container>
+
+              <div class="modal-slider-slide" *ngIf="modalImages.length === 0">
+                <img [src]="selectedProperty.imageUrl" [alt]="selectedProperty.title">
+              </div>
+
+            </div>
+
+            <!-- LEFT ARROW -->
+            <button class="modal-arr modal-arr-prev"
+                    *ngIf="modalImages.length > 1"
+                    (click)="modalSlidePrev()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+
+            <!-- RIGHT ARROW -->
+            <button class="modal-arr modal-arr-next"
+                    *ngIf="modalImages.length > 1"
+                    (click)="modalSlideNext()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+
+            <!-- DOT INDICATORS -->
+            <div class="modal-dots" *ngIf="modalImages.length > 1">
+              <button class="modal-dot"
+                      *ngFor="let img of modalImages; let i = index"
+                      [class.modal-dot-on]="modalSliderIndex === i"
+                      (click)="modalGoTo(i)">
+              </button>
+            </div>
+
+            <!-- IMAGE COUNTER -->
+            <div class="modal-img-counter" *ngIf="modalImages.length > 1">
+              {{ modalSliderIndex + 1 }} / {{ modalImages.length }}
+            </div>
+
+            <!-- STATUS BADGE -->
+            <div class="property-modal-badge">{{ selectedProperty.status }}</div>
+
+          </div>
+          <!-- END IMAGE SLIDER -->
+
+          <!-- MODAL CONTENT -->
+          <div class="property-modal-content">
+            <div class="property-modal-top">
+              <div>
+                <div class="property-modal-type">{{ selectedProperty.propertyType }}</div>
+                <h2 class="property-modal-title">{{ selectedProperty.title }}</h2>
+                <p class="property-modal-location">📍 {{ selectedProperty.city }}, {{ selectedProperty.state }}</p>
+              </div>
+              <div class="property-modal-price">₹ {{ selectedProperty.price | number }}</div>
+            </div>
+
+            <div class="property-detail-grid">
+              <div class="detail-box">
+                <span class="detail-label">Property Type</span>
+                <span class="detail-value">{{ selectedProperty.propertyType }}</span>
+              </div>
+              <div class="detail-box">
+                <span class="detail-label">Listing Type</span>
+                <span class="detail-value">{{ selectedProperty.listingType }}</span>
+              </div>
+              <div class="detail-box">
+                <span class="detail-label">Size</span>
+                <span class="detail-value">{{ selectedProperty.size }} sqft</span>
+              </div>
+              <div class="detail-box">
+                <span class="detail-label">Status</span>
+                <span class="detail-value">{{ selectedProperty.status }}</span>
+              </div>
+            </div>
+
+            <div class="property-description-section">
+              <h3>Description</h3>
+              <p class="property-full-description">{{ selectedProperty.description }}</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <!-- END PROPERTY DETAILS MODAL -->
+
+    </div><!-- end .tab-content -->
+
+    <app-offer *ngIf="showOfferModal && selectedProperty" [property]="selectedProperty"
+      (closed)="onOfferClosed()" (offerMade)="onOfferMade($event)">
+    </app-offer>
+
+    <app-payment *ngIf="showPaymentModal && selectedProperty" [property]="selectedProperty"
+      [offerId]="pendingOfferId" [offerAmount]="pendingOfferAmount"
+      (closed)="onPaymentClosed()" (paymentSuccess)="onPaymentSuccess($event)">
+    </app-payment>
+
+  </div><!-- end .dashboard-body -->
+
+</div><!-- end .buyer-dashboard -->

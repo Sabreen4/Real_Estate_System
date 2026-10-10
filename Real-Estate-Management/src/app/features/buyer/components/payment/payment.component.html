@@ -1,0 +1,252 @@
+<!-- BACKDROP -->
+<div class="backdrop" (click)="close()"></div>
+
+<!-- MODAL -->
+<div class="modal pay-modal">
+
+  <!-- ── PROCESSING ─────────────────────────────────────── -->
+  <div class="processing-state" *ngIf="step === 'processing'">
+    <div class="processing-ring">
+      <div class="processing-spinner"></div>
+    </div>
+    <h3>Processing Payment…</h3>
+    <p>Please don't close this window</p>
+  </div>
+
+  <!-- ── SUCCESS ────────────────────────────────────────── -->
+  <div class="success-state" *ngIf="step === 'success'">
+    <div class="success-ring">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    </div>
+    <h4>Payment Successful!</h4>
+    <p>Your transaction has been recorded.</p>
+    <div class="txn-box">
+      <div class="txn-row">
+        <span class="txn-key">Transaction ID</span>
+        <span class="txn-val">#{{ confirmedTxnId }}</span>
+      </div>
+      <div class="txn-row">
+        <span class="txn-key">Property</span>
+        <span class="txn-val">{{ property?.title }}</span>
+      </div>
+      <div class="txn-row">
+        <span class="txn-key">Amount Paid</span>
+        <span class="txn-val highlight">{{ formatPrice(amount) }}</span>
+      </div>
+      <div class="txn-row">
+        <span class="txn-key">Method</span>
+        <span class="txn-val">{{ selectedMethod.label }}</span>
+      </div>
+    </div>
+    <p class="success-note">A confirmation has been sent to your registered email.</p>
+    <button class="btn-primary" (click)="close()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      Done
+    </button>
+  </div>
+
+  <!-- ── METHOD SELECTION ──────────────────────────────── -->
+  <ng-container *ngIf="step === 'method'">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-icon pay-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <div class="header-text">
+        <h3>Complete Payment</h3>
+        <p>Select a payment method to proceed</p>
+      </div>
+      <button class="close-btn" (click)="close()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Amount Banner -->
+    <div class="amount-banner">
+      <div class="amount-label">Total Amount Payable</div>
+      <div class="amount-value">{{ formatPrice(amount) }}</div>
+      <div class="amount-prop" *ngIf="property">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        </svg>
+        {{ property.title }}
+      </div>
+      <div class="amount-secure">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Secured by 256-bit SSL
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="error-box" *ngIf="errorMsg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ errorMsg }}
+      </div>
+
+      <p class="section-label">Choose Payment Method</p>
+
+      <!-- Method Tabs -->
+      <div class="method-tabs">
+        <button *ngFor="let m of paymentMethods"
+                class="method-tab" [class.active]="selectedMethodId === m.id"
+                (click)="selectMethod(m.id)">
+          <!-- UPI icon -->
+          <svg *ngIf="m.icon === 'upi'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          </svg>
+          <!-- GPay icon -->
+          <svg *ngIf="m.icon === 'gpay'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/>
+          </svg>
+          <!-- Card icon -->
+          <svg *ngIf="m.icon === 'card'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+          <!-- Bank icon -->
+          <svg *ngIf="m.icon === 'bank'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <line x1="3" y1="22" x2="21" y2="22"/>
+            <line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/>
+            <line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/>
+            <polygon points="12 2 20 7 4 7"/>
+          </svg>
+          <!-- Wire icon -->
+          <svg *ngIf="m.icon === 'wire'" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+          <span class="method-name">{{ m.label }}</span>
+        </button>
+      </div>
+
+      <!-- Method detail desc -->
+      <p class="method-desc-text">{{ selectedMethod.desc }}</p>
+
+      <!-- ── UPI Fields ── -->
+      <div class="method-fields" *ngIf="selectedMethodId === 'UPI'">
+        <div class="field-group">
+          <label>UPI ID <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="upiId" class="field-input" placeholder="yourname@okicici / name@ybl">
+          <span class="field-hint">Enter your UPI VPA (Virtual Payment Address)</span>
+        </div>
+        <div class="upi-apps">
+          <span class="upi-app-chip">📱 PhonePe</span>
+          <span class="upi-app-chip">🟢 Paytm</span>
+          <span class="upi-app-chip">🔵 BHIM</span>
+          <span class="upi-app-chip">🟠 Amazon Pay</span>
+        </div>
+      </div>
+
+      <!-- ── GPay Fields ── -->
+      <div class="method-fields" *ngIf="selectedMethodId === 'GPAY'">
+        <div class="field-group">
+          <label>Mobile Number linked to GPay <span class="req">*</span></label>
+          <div class="phone-wrap">
+            <span class="phone-prefix">+91</span>
+            <input type="text" [(ngModel)]="gpayNumber" class="field-input phone-input"
+                   placeholder="10-digit mobile number" maxlength="10">
+          </div>
+          <span class="field-hint">Must be the number registered with Google Pay</span>
+        </div>
+        <div class="upi-apps">
+          <span class="upi-app-chip gpay-chip">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+            </svg>
+            Google Pay
+          </span>
+        </div>
+      </div>
+
+      <!-- ── Card Fields ── -->
+      <div class="method-fields" *ngIf="selectedMethodId === 'CARD'">
+        <div class="field-group">
+          <label>Card Number <span class="req">*</span></label>
+          <input type="text" [value]="cardNumber" (input)="formatCard($event)"
+                 class="field-input card-input" placeholder="0000 0000 0000 0000" maxlength="19">
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label>Expiry <span class="req">*</span></label>
+            <input type="text" [value]="cardExpiry" (input)="formatExpiry($event)"
+                   class="field-input" placeholder="MM/YY" maxlength="5">
+          </div>
+          <div class="field-group">
+            <label>CVV <span class="req">*</span></label>
+            <input type="password" [(ngModel)]="cardCvv" class="field-input" placeholder="•••" maxlength="4">
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Cardholder Name <span class="req">*</span></label>
+          <input type="text" [(ngModel)]="cardHolder" class="field-input" placeholder="Name on card">
+        </div>
+      </div>
+
+      <!-- ── Net Banking Fields ── -->
+      <div class="method-fields" *ngIf="selectedMethodId === 'NETBANK'">
+        <div class="field-group">
+          <label>Select Your Bank <span class="req">*</span></label>
+          <select [(ngModel)]="selectedBank" class="field-input field-select">
+            <option value="">— Choose bank —</option>
+            <option *ngFor="let b of banks" [value]="b">{{ b }}</option>
+          </select>
+        </div>
+        <div class="info-note" *ngIf="selectedBank">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          You'll be redirected to <strong>{{ selectedBank }}</strong>'s secure portal.
+        </div>
+      </div>
+
+      <!-- ── Bank Transfer ── -->
+      <div class="method-fields" *ngIf="selectedMethodId === 'TRANSFER'">
+        <div class="transfer-box">
+          <div class="transfer-row">
+            <span class="transfer-key">Account Name</span>
+            <span class="transfer-val">Real Estate Management Ltd</span>
+          </div>
+          <div class="transfer-row">
+            <span class="transfer-key">Account No.</span>
+            <span class="transfer-val mono">123456789012</span>
+          </div>
+          <div class="transfer-row">
+            <span class="transfer-key">IFSC Code</span>
+            <span class="transfer-val mono">HDFC0001234</span>
+          </div>
+          <div class="transfer-row">
+            <span class="transfer-key">Amount</span>
+            <span class="transfer-val highlight">{{ formatPrice(amount) }}</span>
+          </div>
+          <div class="transfer-note">
+            Use Property ID <strong>{{ property?.id }}</strong> as the payment reference/remarks.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-ghost" (click)="close()">Cancel</button>
+      <button class="btn-pay-btn" (click)="confirm()" [disabled]="!isMethodValid()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Pay {{ formatPrice(amount) }} Securely
+      </button>
+    </div>
+
+  </ng-container>
+</div>

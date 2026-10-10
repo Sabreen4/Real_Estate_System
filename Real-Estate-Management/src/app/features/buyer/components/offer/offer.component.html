@@ -1,0 +1,128 @@
+<!-- BACKDROP -->
+<div class="backdrop" (click)="close()"></div>
+
+<!-- MODAL -->
+<div class="modal">
+
+  <!-- SUCCESS STATE -->
+  <div class="success-state" *ngIf="isSuccess">
+    <div class="success-ring">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5">
+        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+      </svg>
+    </div>
+    <h4>Offer Submitted!</h4>
+    <p>
+      Your offer of <strong>{{ formatPrice(offerAmount!) }}</strong> on
+      <strong>{{ property?.title }}</strong> has been sent to the agent.
+    </p>
+    
+  </div>
+
+  <!-- FORM STATE -->
+  <ng-container *ngIf="!isSuccess">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-icon">
+        ₹
+      </div>
+      <div class="header-text">
+        <h3>Submit an Offer</h3>
+        <p>Make an offer — agent reviews and responds</p>
+      </div>
+      <button class="close-btn" (click)="close()">
+        ₹
+      </button>
+    </div>
+
+    <!-- Property Banner -->
+    <div class="property-banner" *ngIf="property">
+      <div class="property-thumb">
+        <img *ngIf="property.imageUrl" [src]="property.imageUrl" [alt]="property.title">
+        <div class="thumb-placeholder" *ngIf="!property.imageUrl">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+      </div>
+      <div class="property-info">
+        <div class="property-name">{{ property.title }}</div>
+        <div class="property-loc">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          {{ property.city }}, {{ property.state }}
+        </div>
+        <div class="asking-row">
+          <span class="asking-label">Asking:</span>
+          <span class="asking-price">{{ formatPrice(property.price) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <div class="error-box" *ngIf="errorMsg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ errorMsg }}
+      </div>
+
+      <!-- Price compare (only once user entered something) -->
+      <div class="price-compare" *ngIf="offerAmount && property?.price">
+        <div class="compare-item">
+          <span class="ci-label">Asking Price</span>
+          <span class="ci-value">{{ formatPrice(property!.price) }}</span>
+        </div>
+        <span class="compare-arrow">→</span>
+        <div class="compare-item your">
+          <span class="ci-label">Your Offer</span>
+          <span class="ci-value offer-val">{{ formatPrice(offerAmount) }}</span>
+        </div>
+        <span class="diff-badge" [class.above]="diffAbove" [class.below]="!diffAbove">
+          {{ diffAbove ? '+' : '' }}{{ diffPct }}%
+        </span>
+      </div>
+
+      <div class="field-group">
+        <label>Offer Amount (₹) <span class="req">*</span></label>
+        <div class="amount-wrap">
+          <span class="rupee-prefix">₹</span>
+          <input type="number" [(ngModel)]="offerAmount" placeholder="Enter your offer price"
+                 class="field-input amount-input">
+        </div>
+      </div>
+
+      <!-- Suggestion chips -->
+      <div class="suggestions" *ngIf="suggestions.length">
+        <span class="sug-label">Quick:</span>
+        <button *ngFor="let s of suggestions" class="sug-btn" (click)="setSuggestion(s)">
+          {{ formatPrice(s) }}
+        </button>
+      </div>
+
+      <div class="field-group">
+        <label>Message to Agent (optional)</label>
+        <textarea [(ngModel)]="message" placeholder="Any message for the agent…"
+                  class="field-input" rows="3" style="resize:vertical"></textarea>
+      </div>
+      
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-ghost" (click)="close()">Cancel</button>
+      <button class="btn-primary" (click)="submit()" [disabled]="isSubmitting">
+         ₹
+        <span class="spinner" *ngIf="isSubmitting"></span>
+        <span>{{ isSubmitting ? 'Submitting…' : 'Submit Offer' }}</span>
+      </button>
+    </div>
+
+  </ng-container>
+</div>

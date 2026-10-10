@@ -1,0 +1,105 @@
+<div class="register-wrapper">
+  <div class="register-card">
+<!-- <app-back-button class="reg-back"></app-back-button> -->
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-icon">◆</div>
+      <h1>Create Account</h1>
+      <p>Join our real estate platform</p>
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- First Name -->
+     <div class="form-row">
+  <div class="form-group">
+    <label>First Name</label>
+    <input type="text" formControlName="firstName" placeholder="First name" />
+    <span class="error" *ngIf="f['firstName'].touched && f['firstName'].hasError('required')">First name is required.</span>
+    <span class="error" *ngIf="f['firstName'].touched && f['firstName'].hasError('minlength')">Minimum 2 characters.</span>
+  </div>
+  <div class="form-group">
+    <label>Last Name</label>
+    <input type="text" formControlName="lastName" placeholder="Last name" />
+    <span class="error" *ngIf="f['lastName'].touched && f['lastName'].hasError('required')">Last name is required.</span>
+    <span class="error" *ngIf="f['lastName'].touched && f['lastName'].hasError('minlength')">Minimum 2 characters.</span>
+  </div>
+</div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" formControlName="email" placeholder="Email address" />
+        <span class="error" *ngIf="f['email'].touched && f['email'].hasError('required')">
+          Email is required.
+        </span>
+        <span class="error" *ngIf="f['email'].touched && f['email'].hasError('email')">
+          Enter a valid email.
+        </span>
+      </div>
+
+      <!-- Phone -->
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" formControlName="phone" placeholder="10-digit phone number" />
+        <span class="error" *ngIf="f['phone'].touched && f['phone'].hasError('required')">
+          Phone is required.
+        </span>
+        <span class="error" *ngIf="f['phone'].touched && f['phone'].hasError('pattern')">
+          Enter a valid 10-digit number.
+        </span>
+      </div>
+
+      <!-- Role -->
+      <div class="form-group">
+        <label>Role</label>
+        <select formControlName="role">
+          <option value="" disabled>Select a role</option>
+          <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+        </select>
+        <span class="error" *ngIf="f['role'].touched && f['role'].hasError('required')">
+          Role is required.
+        </span>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" formControlName="password" placeholder="Password" />
+        <span class="error" *ngIf="f['password'].touched && f['password'].hasError('required')">
+          Password is required.
+        </span>
+        <span class="error" *ngIf="f['password'].touched && f['password'].hasError('minlength')">
+          Minimum 6 characters.
+        </span>
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" formControlName="confirmPassword" placeholder="Confirm password" />
+        <span class="error" *ngIf="f['confirmPassword'].touched && f['confirmPassword'].hasError('required')">
+          Please confirm your password.
+        </span>
+        <span class="error" *ngIf="f['confirmPassword'].touched && registerForm.hasError('passwordMismatch')">
+          Passwords do not match.
+        </span>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-register" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Register</span>
+        <span *ngIf="isLoading">Loading...</span>
+      </button>
+       <!-- Back button — bottom center -->
+      <div class="form-back">
+        <app-back-button></app-back-button>
+      </div>
+      
+      
+
+    </form>
+  </div>
+</div>

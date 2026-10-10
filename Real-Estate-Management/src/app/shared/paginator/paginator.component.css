@@ -1,0 +1,42 @@
+.paginator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 0.0625rem solid #e2e8f0;
+  font-size: 0.875rem;
+  color: #475569;
+  background: #f8fafc;
+}
+
+.paginator button {
+  padding: 0.5rem 1rem;
+  border: 0.0625rem solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #475569;
+  font-size: 0.875rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+}
+
+.paginator button:hover:not(:disabled) {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+.paginator button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.paginator span {
+  font-weight: 600;
+  color: #0f172a;
+}

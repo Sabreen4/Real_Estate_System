@@ -1,0 +1,83 @@
+<div class="login-wrapper">
+  <div class="login-card">
+
+    <!-- Logo / Brand -->
+    <div class="brand">
+      <div class="brand-icon">◆</div>
+      <h1>Welcome Back</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <!-- Error Alert -->
+    <div class="alert alert-error" *ngIf="errorMessage">
+      <span>!</span> {{ errorMessage }}
+    </div>
+
+    <!-- Login Form -->
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
+
+      <!-- Email Field -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <div class="input-wrapper">
+          <span class="input-icon"></span>
+
+          <input type="email" id="email" name="email" [(ngModel)]="loginData.email" #email="ngModel" required email
+            placeholder="you@example.com" [class.input-error]="email.invalid && email.touched" />
+        </div>
+
+        <div class="error-text" *ngIf="email.invalid && email.touched">
+          <span *ngIf="email.errors?.['required']">
+            Email is required.
+          </span>
+
+          <span *ngIf="email.errors?.['email']">
+            Enter a valid email address.
+          </span>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-group">
+        <label for="password">Password</label>
+
+        <div class="input-wrapper">
+          <span class="input-icon"></span>
+
+          <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+            [(ngModel)]="loginData.password" #password="ngModel" required minlength="6"
+            placeholder="Enter your password" [class.input-error]="password.invalid && password.touched" />
+
+          <span class="toggle-eye" (click)="togglePasswordVisibility()">
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </span>
+        </div>
+
+        <div class="error-text" *ngIf="password.invalid && password.touched">
+          <span *ngIf="password.errors?.['required']">
+            Password is required.
+          </span>
+
+          <span *ngIf="password.errors?.['minlength']">
+            Minimum 6 characters.
+          </span>
+        </div>
+      </div>
+      <!-- With this -->
+      <div class="forgot-row">
+        <a (click)="goToForgotPassword()" style="cursor:pointer;">Forgot Password?</a>
+      </div>
+
+
+      <!-- Submit Button -->
+      <button type="submit" class="btn-login" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading" class="spinner"></span>
+      </button>
+
+    </form>
+
+   
+
+  </div>
+</div>

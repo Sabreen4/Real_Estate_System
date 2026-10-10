@@ -1,0 +1,171 @@
+/* ── Overlay ── */
+.lb-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 10, 20, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: lbFade 0.2s ease;
+}
+
+@keyframes lbFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Shell (full overlay, no width constraint) ── */
+.lb-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 4rem 1rem 3rem;
+}
+
+/* ── Close button ── */
+.lb-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  z-index: 10;
+}
+
+.lb-close:hover {
+  background: rgba(220, 38, 38, 0.75);
+  border-color: transparent;
+  transform: rotate(90deg);
+}
+
+/* ── Counter ── */
+.lb-counter {
+  position: absolute;
+  top: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.3rem 1rem;
+  border-radius: 2rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+}
+
+/* ── Image area (arrows + image side by side) ── */
+.lb-img-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+  max-width: 90vw;
+}
+
+/* ── Arrows ── */
+.lb-arrow {
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+  z-index: 5;
+}
+
+.lb-arrow:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.lb-arrow--prev:hover { transform: translateX(-3px); }
+.lb-arrow--next:hover { transform: translateX(3px); }
+
+/* ── Main image ── */
+.lb-img {
+  display: block;
+  max-width: calc(90vw - 8rem);
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  animation: lbPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes lbPop {
+  from { opacity: 0; transform: scale(0.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── Dot indicators ── */
+.lb-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lb-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.lb-dot--active {
+  background: #ffffff;
+  transform: scale(1.4);
+}
+
+.lb-dot:hover:not(.lb-dot--active) {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  .lb-img-area { gap: 0.5rem; }
+  .lb-arrow { width: 2.25rem; height: 2.25rem; }
+  .lb-img {
+    max-width: calc(100vw - 6rem);
+    max-height: 65vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .lb-shell { padding: 3.5rem 0.5rem 2.5rem; }
+  .lb-arrow { width: 2rem; height: 2rem; }
+  .lb-img {
+    max-width: calc(100vw - 5rem);
+    max-height: 60vh;
+    border-radius: 8px;
+  }
+}

@@ -1,0 +1,65 @@
+<div class="search-container">
+
+  <!-- PROPERTY TYPE -->
+  <div class="search-field field-type">
+    <label>Property Type</label>
+    <div class="custom-select-wrapper" [class.open]="openDropdown === 'type'">
+      <div class="custom-select-trigger"
+           (click)="toggleDropdown('type', $event)">
+        <span>{{ getLabel(propertyTypes, selectedType, 'All Property Types') }}</span>
+        <span class="custom-chevron"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTING TYPE -->
+  <div class="search-field field-listing">
+    <label>Listing Type</label>
+    <div class="custom-select-wrapper" [class.open]="openDropdown === 'listing'">
+      <div class="custom-select-trigger"
+           (click)="toggleDropdown('listing', $event)">
+        <span>{{ getLabel(listingTypes, listingType, 'All Listing Types') }}</span>
+        <span class="custom-chevron"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="search-field field-status" *ngIf="!hideStatus">
+    <label>Status</label>
+    <div class="custom-select-wrapper" [class.open]="openDropdown === 'status'">
+      <div class="custom-select-trigger"
+           (click)="toggleDropdown('status', $event)">
+        <span>{{ getLabel(statuses, status, 'All Status') }}</span>
+        <span class="custom-chevron"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIN PRICE -->
+  <div class="search-field field-price">
+    <label>Min Price</label>
+    <input type="number" placeholder="Min ₹"
+           [(ngModel)]="minPrice" (input)="emitSearch()" />
+  </div>
+
+  <!-- MAX PRICE -->
+  <div class="search-field field-price">
+    <label>Max Price</label>
+    <input type="number" placeholder="Max ₹"
+           [(ngModel)]="maxPrice" (input)="emitSearch()" />
+  </div>
+
+  <!-- LOCATION -->
+  <div class="search-field field-location">
+    <label>Location</label>
+    <input type="text" placeholder="Search by city"
+           [(ngModel)]="location" (input)="emitSearch()" />
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="search-actions">
+    <button class="btn-clear" (click)="clearFilters()">Clear</button>
+  </div>
+
+</div>

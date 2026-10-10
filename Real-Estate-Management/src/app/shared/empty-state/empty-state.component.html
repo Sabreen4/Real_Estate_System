@@ -1,0 +1,8 @@
+<div class="empty-state">
+      <div class="empty-icon">{{ icon }}</div>
+      <p class="empty-title">{{ title }}</p>
+      <p class="empty-sub">{{ subtitle }}</p>
+      <button *ngIf="ctaLabel" class="empty-cta" (click)="ctaClicked.emit()">
+        {{ ctaLabel }}
+      </button>
+    </div>

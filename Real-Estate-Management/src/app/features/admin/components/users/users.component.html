@@ -1,0 +1,246 @@
+<app-toast [successMessage]="successMessage" [errorMessage]="errorMessage"></app-toast>
+
+<!-- TOP BAR -->
+ 
+<div class="topbar">
+   <!-- <app-back-button></app-back-button> -->
+  <div class="topbar-left">
+   
+    <div class="brand">
+      <div class="brand-icon">👥</div>
+      <div>
+        <h1 class="brand-title">User Management</h1>
+        <span class="brand-sub">All registered users</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content-card">
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <h2 class="card-title">All Users</h2>
+    <div class="card-header-actions">
+      <button class="btn-add-user" (click)="openAddUserModal()">+ Add User</button>
+
+      <div class="search-wrapper">
+        <span class="search-icon"></span>
+        <input class="search-input" type="text" placeholder="Search by name, email or phone..."
+          [(ngModel)]="searchText" (input)="applySearch()" />
+        <button class="clear-btn" *ngIf="searchText" (click)="searchText=''; applySearch()">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div class="loader-wrap" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <span>Loading users...</span>
+  </div>
+
+  <app-empty-state
+    *ngIf="!isLoading && filteredUsers.length === 0"
+    icon="👥"
+    title="No users found"
+    [subtitle]="searchText ? 'No results for &quot;' + searchText + '&quot;' : ''">
+  </app-empty-state>
+
+  <!-- TABLE -->
+  <div class="table-wrap" *ngIf="!isLoading && filteredUsers.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>User</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of paginatedUsers">
+          <td class="cell-id">{{ user.id }}</td>
+          <td class="cell-user">
+            <div class="avatar">{{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}</div>
+            <div class="user-name">{{ user.firstName }} {{ user.lastName }}</div>
+          </td>
+          <td class="cell-email">{{ user.email }}</td>
+          <td>{{ user.phone || '—' }}</td>
+          <td>
+            <app-status-badge [label]="getRoleDisplay(user)" type="role">
+              {{ getRoleDisplay(user) }}
+            </app-status-badge>
+          </td>
+          <td class="cell-actions">
+            <app-action-buttons (editClicked)="openEdit(user)" (deleteClicked)="confirmDelete(user)">
+            </app-action-buttons>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RESULT COUNT -->
+  <div class="result-count" *ngIf="!isLoading && filteredUsers.length > 0">
+    Showing {{ paginatedUsers.length }} of {{ filteredUsers.length }} users
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination-container" *ngIf="!isLoading && filteredUsers.length > 0">
+    <app-back-button></app-back-button>
+    <button (click)="previousPage()" [disabled]="currentPage === 1">Previous</button>
+    <span>Page {{ currentPage }} of {{ totalPages() }}</span>
+    <button (click)="nextPage()" [disabled]="currentPage === totalPages()">Next</button>
+  </div>
+
+</div>
+
+<!-- ===================================================== -->
+<!-- EDIT USER MODAL -->
+<!-- ===================================================== -->
+<div class="modal-overlay" *ngIf="selectedUser" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-avatar">
+        {{ selectedUser.firstName.charAt(0) }}{{ selectedUser.lastName.charAt(0) }}
+      </div>
+      <div>
+        <h2 class="modal-title">Edit User</h2>
+        <span class="modal-sub">ID #{{ selectedUser.id }}</span>
+      </div>
+      <button class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" [(ngModel)]="editUser.firstName" placeholder="First name" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" [(ngModel)]="editUser.lastName" placeholder="Last name" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" [(ngModel)]="editUser.email" placeholder="email@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" [(ngModel)]="editUser.phone" placeholder="+91 00000 00000" />
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button class="btn-save" (click)="updateUser()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================================================== -->
+<!-- DELETE MODAL -->
+<!-- ===================================================== -->
+<app-confirm-delete-modal
+  [visible]="!!deleteConfirmUser"
+  title="Delete User?"
+  [description]="'Are you sure you want to delete <strong>' + deleteConfirmUser?.firstName + ' ' + deleteConfirmUser?.lastName + '</strong> (' + deleteConfirmUser?.email + ')?'"
+  (confirmed)="deleteUser()"
+  (cancelled)="closeDeleteConfirm()">
+</app-confirm-delete-modal>
+
+<!-- ===================================================== -->
+<!-- ADD USER MODAL — reactive form                        -->
+<!-- ===================================================== -->
+<div class="modal-overlay" *ngIf="showAddUserModal" (click)="closeAddUserModal()">
+  <div class="modal modal-add" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-avatar">+</div>
+      <div>
+        <h2 class="modal-title">Register New User</h2>
+        <span class="modal-sub">Add a new Property Consultant or Buyer</span>
+      </div>
+      <button type="button" class="modal-close" (click)="closeAddUserModal()">✕</button>
+    </div>
+
+    <form [formGroup]="addUserForm" (ngSubmit)="submitAddUser()" novalidate>
+      <div class="modal-body">
+
+        <!-- First Name / Last Name -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" formControlName="firstName" placeholder="First name" />
+            <span class="error" *ngIf="f['firstName'].touched && f['firstName'].hasError('required')">First name is required.</span>
+            <span class="error" *ngIf="f['firstName'].touched && f['firstName'].hasError('minlength')">Minimum 2 characters.</span>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" formControlName="lastName" placeholder="Last name" />
+            <span class="error" *ngIf="f['lastName'].touched && f['lastName'].hasError('required')">Last name is required.</span>
+            <span class="error" *ngIf="f['lastName'].touched && f['lastName'].hasError('minlength')">Minimum 2 characters.</span>
+          </div>
+        </div>
+
+        <!-- Email / Phone -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" formControlName="email" placeholder="email@example.com" />
+            <span class="error" *ngIf="f['email'].touched && f['email'].hasError('required')">Email is required.</span>
+            <span class="error" *ngIf="f['email'].touched && f['email'].hasError('email')">Enter a valid email.</span>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" formControlName="phone" placeholder="10-digit phone number" />
+            <span class="error" *ngIf="f['phone'].touched && f['phone'].hasError('required')">Phone is required.</span>
+            <span class="error" *ngIf="f['phone'].touched && f['phone'].hasError('pattern')">Enter a valid 10-digit number.</span>
+          </div>
+        </div>
+
+        <!-- Role -->
+        <div class="form-group">
+          <label>Role</label>
+          <select formControlName="role">
+            <option value="" disabled>Select a role</option>
+            <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+          </select>
+          <span class="error" *ngIf="f['role'].touched && f['role'].hasError('required')">Role is required.</span>
+        </div>
+
+        <!-- Password / Confirm Password -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" formControlName="password" placeholder="Password" />
+            <span class="error" *ngIf="f['password'].touched && f['password'].hasError('required')">Password is required.</span>
+            <span class="error" *ngIf="f['password'].touched && f['password'].hasError('minlength')">Minimum 6 characters.</span>
+          </div>
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" formControlName="confirmPassword" placeholder="Confirm password" />
+            <span class="error" *ngIf="f['confirmPassword'].touched && f['confirmPassword'].hasError('required')">Please confirm your password.</span>
+            <span class="error" *ngIf="f['confirmPassword'].touched && addUserForm.hasError('passwordMismatch')">Passwords do not match.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="closeAddUserModal()">Cancel</button>
+        <button type="submit" class="btn-save" [disabled]="addUserLoading">
+          {{ addUserLoading ? 'Registering…' : 'Register User' }}
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>

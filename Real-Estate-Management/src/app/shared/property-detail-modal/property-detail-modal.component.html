@@ -1,0 +1,116 @@
+<div class="pdm-overlay" *ngIf="visible && property" (click)="onBackdropClick()">
+  <div class="pdm-modal" (click)="$event.stopPropagation()">
+
+    <!-- CLOSE BUTTON -->
+    <button class="pdm-close" (click)="close()" aria-label="Close">✕</button>
+
+    <!-- ── IMAGE CAROUSEL ─────────────────────────────────────────── -->
+    <div class="pdm-carousel">
+
+      <!-- No image fallback -->
+      <div class="pdm-no-img" *ngIf="images.length === 0">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+             stroke="#9ca3af" stroke-width="1.2">
+          <rect x="3" y="3" width="18" height="18" rx="2"/>
+          <circle cx="8.5" cy="8.5" r="1.5"/>
+          <polyline points="21 15 16 10 5 21"/>
+        </svg>
+        <span>No image available</span>
+      </div>
+
+      <!-- Slides -->
+      <ng-container *ngIf="images.length > 0">
+        <div class="pdm-slides">
+          <div class="pdm-slide"
+               *ngFor="let img of images; let i = index"
+               [class.pdm-slide-active]="i === activeIndex">
+            <img [src]="img" alt="Property image {{ i + 1 }}" class="pdm-img">
+          </div>
+        </div>
+
+        <!-- Status badge overlaid on image -->
+        <div class="pdm-status-badge">{{ property.status }}</div>
+
+        <!-- Counter top-right -->
+        <div class="pdm-counter" *ngIf="images.length > 1">
+          {{ activeIndex + 1 }} / {{ images.length }}
+        </div>
+
+        <!-- Prev / Next arrows -->
+        <button class="pdm-arrow pdm-arrow-prev" *ngIf="images.length > 1"
+                (click)="prev()" aria-label="Previous">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+        <button class="pdm-arrow pdm-arrow-next" *ngIf="images.length > 1"
+                (click)="next()" aria-label="Next">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+
+        <!-- Dot indicators -->
+        <div class="pdm-dots" *ngIf="images.length > 1">
+          <button *ngFor="let img of images; let i = index"
+                  class="pdm-dot" [class.pdm-dot-active]="i === activeIndex"
+                  (click)="goTo(i)" [attr.aria-label]="'Go to image ' + (i+1)">
+          </button>
+        </div>
+      </ng-container>
+    </div>
+    <!-- ── END CAROUSEL ───────────────────────────────────────────── -->
+
+    <!-- ── CONTENT ───────────────────────────────────────────────── -->
+    <div class="pdm-content">
+
+      <!-- Top row: type pill + price -->
+      <div class="pdm-top-row">
+        <div>
+          <div class="pdm-type-pill">{{ property.propertyType }}</div>
+          <h2 class="pdm-title">{{ property.title }}</h2>
+          <p class="pdm-location">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            {{ property.city }}, {{ property.state }}
+          </p>
+        </div>
+        <div class="pdm-price">₹ {{ property.price | number }}</div>
+      </div>
+
+      <!-- Detail grid -->
+      <div class="pdm-detail-grid">
+        <div class="pdm-detail-box">
+          <span class="pdm-detail-label">Property Type</span>
+          <span class="pdm-detail-value">{{ property.propertyType }}</span>
+        </div>
+        <div class="pdm-detail-box">
+          <span class="pdm-detail-label">Listing Type</span>
+          <span class="pdm-detail-value">{{ property.listingType }}</span>
+        </div>
+        <div class="pdm-detail-box">
+          <span class="pdm-detail-label">Size</span>
+          <span class="pdm-detail-value">{{ property.size }} sqft</span>
+        </div>
+        <div class="pdm-detail-box">
+          <span class="pdm-detail-label">Status</span>
+          <span class="pdm-detail-value">{{ property.status }}</span>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="pdm-description-section" *ngIf="property.description">
+        <h3>Description</h3>
+        <p class="pdm-description-text">{{ property.description }}</p>
+      </div>
+
+    </div>
+    <!-- ── END CONTENT ─────────────────────────────────────────── -->
+
+  </div>
+</div>

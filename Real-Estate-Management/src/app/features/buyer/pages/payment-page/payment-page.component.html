@@ -1,0 +1,157 @@
+<div class="page-wrapper">
+ <!-- <div class="back-nav">
+  <app-back-button></app-back-button>
+</div> -->
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-icon purple-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <rect x="1" y="4" width="22" height="16" rx="2"/>
+          <line x1="1" y1="10" x2="23" y2="10"/>
+        </svg>
+      </div>
+      <div>
+        <h2 class="page-title">My Transactions</h2>
+        <p class="page-sub">Payment history for your property purchases</p>
+        
+
+      </div>
+    </div>
+    <div class="page-header-right">
+      <button class="btn-refresh" (click)="load()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+        </svg>
+        Refresh
+      </button>
+      <button class="btn-offers" (click)="goToOffers()">
+       
+        View My Offers
+      </button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="tab-loading" *ngIf="isLoading">
+    <div class="tab-spinner"></div>
+    <span>Loading transactions…</span>
+  </div>
+
+  <!-- EMPTY -->
+  <div class="tab-empty" *ngIf="!isLoading && myPayments.length === 0">
+    <div class="te-icon purple-bg">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.5">
+        <rect x="1" y="4" width="22" height="16" rx="2"/>
+        <line x1="1" y1="10" x2="23" y2="10"/>
+      </svg>
+    </div>
+    <h4>No transactions yet</h4>
+    <p>Your completed payments will appear here</p>
+    <button class="te-cta purple-btn" (click)="goToOffers()">View My Offers</button>
+  </div>
+
+  <!-- SORT + LIST + PAGINATION -->
+  <div *ngIf="!isLoading && myPayments.length > 0">
+
+    <!-- SORT BAR -->
+    <div class="sort-bar">
+      <span class="sort-label">Sort by:</span>
+
+      <button class="sort-btn"
+        [class.sort-active]="sortField === 'transactionDate'"
+        (click)="setSort('transactionDate')">
+        Date
+        <svg *ngIf="sortField === 'transactionDate'" width="12" height="12"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline *ngIf="sortAsc"  points="18 15 12 9 6 15"/>
+          <polyline *ngIf="!sortAsc" points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      <button class="sort-btn"
+        [class.sort-active]="sortField === 'amount'"
+        (click)="setSort('amount')">
+        Amount
+        <svg *ngIf="sortField === 'amount'" width="12" height="12"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline *ngIf="sortAsc"  points="18 15 12 9 6 15"/>
+          <polyline *ngIf="!sortAsc" points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      <button class="sort-btn"
+        [class.sort-active]="sortField === 'propertyTitle'"
+        (click)="setSort('propertyTitle')">
+        Property
+        <svg *ngIf="sortField === 'propertyTitle'" width="12" height="12"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline *ngIf="sortAsc"  points="18 15 12 9 6 15"/>
+          <polyline *ngIf="!sortAsc" points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+    </div>
+
+    <!-- CARDS -->
+    <div class="tab-cards">
+      <div class="tc-payment" *ngFor="let p of pagedPayments">
+
+        <div class="tc-txn-block">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+        </div>
+
+        <div class="tc-info">
+
+          <!-- Property Name -->
+          <div class="tc-title">
+            {{ p.propertyTitle || ('Property #' + p.propertyId) }}
+          </div>
+
+          <!-- Transaction Reference -->
+          <div class="tc-meta txn-id" *ngIf="p.transactionReference">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+            </svg>
+            REF: {{ p.transactionReference }}
+          </div>
+
+          <!-- Date — uses transactionDate, falls back to stable random for old records -->
+          <div class="tc-meta">
+           {{ getDisplayDate(p.paymentDate) | date:'dd MMM yyyy, h:mm a' }}
+          </div>
+
+        </div>
+
+        <div class="tc-right">
+          <div class="tc-paid-amount">₹ {{ p.amount | number }}</div>
+          <span class="ts-badge" [ngClass]="getStatusClass(p.status)">
+            {{ getStatusLabel(p.status) }}
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PAGINATION -->
+<!-- PAGINATION -->
+<div class="pagination-row">
+  <app-back-button></app-back-button>
+  <app-paginator 
+    [currentPage]="currentPage" 
+    [totalPages]="totalPages" 
+    (pageChange)="goToPage($event)">
+  </app-paginator>
+</div>
+
+</div>

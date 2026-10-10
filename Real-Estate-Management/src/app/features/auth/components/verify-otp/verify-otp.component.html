@@ -1,0 +1,42 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-icon">◆</div>
+      <h1>Verify OTP</h1>
+      <p>Enter the 6-digit code sent to <strong>{{ email }}</strong></p>
+    </div>
+
+    <div class="alert alert-error" *ngIf="errorMessage">
+      <span>!</span> {{ errorMessage }}
+    </div>
+
+    <div class="form-group">
+      <label for="otp">OTP Code</label>
+      <div class="input-wrapper">
+        <input
+          type="text"
+          id="otp"
+          name="otp"
+          [(ngModel)]="otp"
+          maxlength="6"
+          placeholder="Enter 6-digit OTP"
+          [class.input-error]="errorMessage"
+        />
+      </div>
+    </div>
+
+    <button class="btn-login" (click)="onSubmit()" [disabled]="isLoading">
+      <span *ngIf="!isLoading">Verify OTP</span>
+      <span *ngIf="isLoading" class="spinner"></span>
+    </button>
+
+    <p class="register-link" style="margin-top: 1rem;">
+      <span *ngIf="!canResend">Resend OTP in {{ resendCooldown }}s</span>
+      <a *ngIf="canResend" (click)="resendOtp()" style="cursor:pointer;">Resend OTP</a>
+    </p>
+
+    <p class="register-link">
+      <a routerLink="/login">← Change Email</a>
+    </p>
+  </div>
+</div>

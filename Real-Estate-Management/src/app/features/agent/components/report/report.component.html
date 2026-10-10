@@ -1,0 +1,483 @@
+<div class="report-root">
+
+  <!-- ══ TOOLBAR ══ -->
+  <div class="report-toolbar">
+
+    <div class="toolbar-left-group">
+      <!-- <app-back-button></app-back-button> -->
+      <div class="toolbar-left">
+        <div class="toolbar-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="toolbar-title">Property Report</h1>
+          <p class="toolbar-sub" *ngIf="report">
+            {{ report.totalProperties }} properties &nbsp;·&nbsp; Generated {{ formatDate(report.generatedAt) }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="toolbar-actions" *ngIf="!isLoading && report">
+      <button class="btn-refresh" (click)="loadReport()" title="Refresh">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polyline points="23 4 23 10 17 10"/>
+          <polyline points="1 20 1 14 7 14"/>
+          <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+        </svg>
+        Refresh
+      </button>
+      <button class="btn-csv" (click)="exportExcel()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9"  y1="15" x2="12" y2="18"/>
+          <line x1="15" y1="15" x2="12" y2="18"/>
+        </svg>
+        Export CSV
+      </button>
+      <button class="btn-pdf" (click)="exportPDF()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <path d="M9 13h1a2 2 0 010 4H9v-4z"/>
+          <line x1="15" y1="13" x2="15" y2="17"/>
+          <line x1="13" y1="15" x2="17" y2="15"/>
+        </svg>
+        Export PDF
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ══ LOADER ══ -->
+  <div class="report-loader" *ngIf="isLoading">
+    <div class="loader-ring"></div>
+    <p>Building your report…</p>
+  </div>
+
+  <!-- ══ ERROR ══ -->
+  <div class="report-error" *ngIf="!isLoading && errorMsg">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8"  x2="12"    y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    {{ errorMsg }}
+    <button (click)="loadReport()">Retry</button>
+  </div>
+
+  <!-- ══ MAIN CONTENT ══ -->
+  <div class="report-body" *ngIf="!isLoading && report">
+
+    <!-- ── SUMMARY KPI STRIP ── -->
+    <div class="kpi-strip">
+      <div class="kpi-chip kpi-chip--blue">
+        <span class="kpi-chip-val">{{ report.totalProperties }}</span>
+        <span class="kpi-chip-lbl">Total</span>
+      </div>
+      <div class="kpi-chip kpi-chip--green">
+        <span class="kpi-chip-val">{{ report.activeProperties }}</span>
+        <span class="kpi-chip-lbl">Active</span>
+      </div>
+      <div class="kpi-chip kpi-chip--red">
+        <span class="kpi-chip-val">{{ report.soldProperties }}</span>
+        <span class="kpi-chip-lbl">Sold</span>
+      </div>
+      <div class="kpi-chip kpi-chip--amber">
+        <span class="kpi-chip-val">{{ report.forSaleCount }}</span>
+        <span class="kpi-chip-lbl">For Sale</span>
+      </div>
+      <div class="kpi-chip kpi-chip--sky">
+        <span class="kpi-chip-val">{{ report.forRentCount }}</span>
+        <span class="kpi-chip-lbl">For Rent</span>
+      </div>
+      <div class="kpi-chip kpi-chip--purple">
+        <span class="kpi-chip-val">{{ report.leaseCount }}</span>
+        <span class="kpi-chip-lbl">Lease</span>
+      </div>
+      <div class="kpi-chip kpi-chip--emerald kpi-chip--wide">
+        <span class="kpi-chip-val">{{ formatCurrency(report.totalPortfolioValue) }}</span>
+        <span class="kpi-chip-lbl">Portfolio Value</span>
+      </div>
+      <div class="kpi-chip kpi-chip--teal kpi-chip--wide">
+        <span class="kpi-chip-val">{{ formatCurrency(report.totalRevenue) }}</span>
+        <span class="kpi-chip-lbl">Revenue</span>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- ─────────── CHARTS SECTION ──────────────────── -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div class="charts-section">
+      <div class="charts-section-header">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6"  y1="20" x2="6"  y2="14"/>
+        </svg>
+        Analytics Overview
+      </div>
+
+      <!-- ROW 1: Two donut charts + pipeline grouped bar -->
+      <div class="charts-row charts-row--3">
+
+        <!-- ── Donut: Property Status ── -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Property Status</span>
+            <span class="chart-card-subtitle">Distribution by status</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas #statusDonutCanvas></canvas>
+          </div>
+        </div>
+
+        <!-- ── Donut: Listing Type ── -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Listing Type</span>
+            <span class="chart-card-subtitle">Sale · Rent · Lease</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas #listingDonutCanvas></canvas>
+          </div>
+        </div>
+
+        <!-- ── Grouped Bar: Pipeline ── -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Pipeline Overview</span>
+            <span class="chart-card-subtitle">Appointments vs Offers</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas #pipelineBarCanvas></canvas>
+          </div>
+        </div>
+
+      </div><!-- /charts-row--3 -->
+
+      <!-- ROW 2: City breakdowns -->
+      <div class="charts-row charts-row--2">
+
+        <!-- ── Horizontal Bar: Properties per City ── -->
+        <div class="chart-card chart-card--tall">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Properties per City</span>
+            <span class="chart-card-subtitle">Top cities by count</span>
+          </div>
+          <div class="chart-canvas-wrap chart-canvas-wrap--tall">
+            <canvas #cityCountBarCanvas></canvas>
+          </div>
+        </div>
+
+        <!-- ── Horizontal Bar: Portfolio Value per City ── -->
+        <div class="chart-card chart-card--tall">
+          <div class="chart-card-header">
+            <span class="chart-card-title">Portfolio Value by City</span>
+            <span class="chart-card-subtitle">Top cities by value</span>
+          </div>
+          <div class="chart-canvas-wrap chart-canvas-wrap--tall">
+            <canvas #cityValueBarCanvas></canvas>
+          </div>
+        </div>
+
+      </div><!-- /charts-row--2 -->
+
+      <!-- ROW 3: Financial summary mini-stats -->
+      <div class="chart-card chart-card--stats-row">
+        <div class="chart-card-header">
+          <span class="chart-card-title">Financial Summary</span>
+          <span class="chart-card-subtitle">Pricing insights across your portfolio</span>
+        </div>
+        <div class="stat-bars-row">
+
+          <div class="stat-bar-item">
+            <span class="stat-bar-label">Average Price</span>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill stat-bar-fill--avg"
+                [style.width.%]="report.highestPrice > 0 ? (report.avgPropertyPrice / report.highestPrice * 100) : 0">
+              </div>
+            </div>
+            <span class="stat-bar-val">{{ formatCurrency(report.avgPropertyPrice) }}</span>
+          </div>
+
+          <div class="stat-bar-item">
+            <span class="stat-bar-label">Highest Price</span>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill stat-bar-fill--high" style="width:100%"></div>
+            </div>
+            <span class="stat-bar-val">{{ formatCurrency(report.highestPrice) }}</span>
+          </div>
+
+          <div class="stat-bar-item">
+            <span class="stat-bar-label">Lowest Price</span>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill stat-bar-fill--low"
+                [style.width.%]="report.highestPrice > 0 ? (report.lowestPrice / report.highestPrice * 100) : 0">
+              </div>
+            </div>
+            <span class="stat-bar-val">{{ formatCurrency(report.lowestPrice) }}</span>
+          </div>
+
+          <div class="stat-bar-item">
+            <span class="stat-bar-label">Total Revenue</span>
+            <div class="stat-bar-track">
+              <div class="stat-bar-fill stat-bar-fill--revenue"
+                [style.width.%]="report.totalPortfolioValue > 0 ? (report.totalRevenue / report.totalPortfolioValue * 100) : 0">
+              </div>
+            </div>
+            <span class="stat-bar-val">{{ formatCurrency(report.totalRevenue) }}</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /charts-section -->
+
+    <!-- ── FILTER BAR ── -->
+    <div class="filter-bar">
+
+      <!-- Status Tabs -->
+      <div class="filter-group">
+        <span class="filter-group-label">Status</span>
+        <div class="filter-tabs">
+          <button
+            *ngFor="let t of statusTabs"
+            class="filter-tab"
+            [class.active]="statusFilter === t.value"
+            [style.--tab-color]="t.color"
+            (click)="setStatusFilter(t.value)">
+            {{ t.label }}
+            <span class="tab-count" *ngIf="t.value === 'ALL'">{{ report.totalProperties }}</span>
+            <span class="tab-count" *ngIf="t.value === 'ACTIVE'">{{ report.activeProperties }}</span>
+            <span class="tab-count" *ngIf="t.value === 'SOLD'">{{ report.soldProperties }}</span>
+            <span class="tab-count" *ngIf="t.value === 'PENDING'">{{ report.totalProperties - report.activeProperties - report.soldProperties }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Listing Type Tabs -->
+      <div class="filter-group">
+        <span class="filter-group-label">Type</span>
+        <div class="filter-tabs">
+          <button
+            *ngFor="let t of listingTabs"
+            class="filter-tab"
+            [class.active]="listingFilter === t.value"
+            [style.--tab-color]="t.color"
+            (click)="setListingFilter(t.value)">
+            {{ t.label }}
+            <span class="tab-count" *ngIf="t.value === 'ALL'">{{ report.totalProperties }}</span>
+            <span class="tab-count" *ngIf="t.value === 'SALE'">{{ report.forSaleCount }}</span>
+            <span class="tab-count" *ngIf="t.value === 'RENT'">{{ report.forRentCount }}</span>
+            <span class="tab-count" *ngIf="t.value === 'LEASE'">{{ report.leaseCount }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search + page size -->
+      <div class="filter-right">
+        <div class="search-box">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            class="search-input"
+            type="text"
+            placeholder="Search title or city…"
+            [(ngModel)]="searchQuery"
+            (input)="onSearch()" />
+          <button class="search-clear" *ngIf="searchQuery" (click)="searchQuery=''; onSearch()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div class="page-size-select">
+          <label class="ps-label">Show</label>
+          <select [(ngModel)]="pageSize" (change)="onPageSizeChange()" class="ps-sel">
+            <option *ngFor="let s of pageSizeOptions" [value]="s">{{ s }}</option>
+          </select>
+          <label class="ps-label">rows</label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RESULTS COUNT ── -->
+    <div class="results-meta">
+      <span class="results-count">
+        Showing <strong>{{ (currentPage-1)*pageSize + 1 }}–{{ getEndRow() }}</strong>
+        of <strong>{{ filteredRows.length }}</strong> properties
+        <span *ngIf="filteredRows.length !== report.totalProperties" class="results-filtered">
+          (filtered from {{ report.totalProperties }})
+        </span>
+      </span>
+    </div>
+
+    <!-- ── TABLE ── -->
+    <div class="table-wrap">
+      <table class="prop-table">
+        <thead>
+          <tr>
+            <th class="th-num">#</th>
+            <th class="th-sortable" (click)="toggleSort('title')">
+              Property
+              <span class="sort-icon"
+                    [class.sort-asc]="sortField==='title' && sortDir==='asc'"
+                    [class.sort-active]="sortField==='title'">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </span>
+            </th>
+            <th class="th-sortable" (click)="toggleSort('city')">
+              City
+              <span class="sort-icon"
+                    [class.sort-asc]="sortField==='city' && sortDir==='asc'"
+                    [class.sort-active]="sortField==='city'">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </span>
+            </th>
+            <th class="th-sortable" (click)="toggleSort('price')">
+              Price
+              <span class="sort-icon"
+                    [class.sort-asc]="sortField==='price' && sortDir==='asc'"
+                    [class.sort-active]="sortField==='price'">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </span>
+            </th>
+            <th class="th-sortable" (click)="toggleSort('status')">
+              Status
+              <span class="sort-icon"
+                    [class.sort-asc]="sortField==='status' && sortDir==='asc'"
+                    [class.sort-active]="sortField==='status'">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </span>
+            </th>
+            <th class="th-sortable" (click)="toggleSort('listingType')">
+              Type
+              <span class="sort-icon"
+                    [class.sort-asc]="sortField==='listingType' && sortDir==='asc'"
+                    [class.sort-active]="sortField==='listingType'">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </span>
+            </th>
+            <th class="th-sortable" (click)="toggleSort('createdAt')">
+              Listed On
+              <span class="sort-icon"
+                    [class.sort-asc]="sortField==='createdAt' && sortDir==='asc'"
+                    [class.sort-active]="sortField==='createdAt'">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- No results -->
+          <tr *ngIf="pagedRows.length === 0">
+            <td colspan="7" class="td-empty">
+              <div class="empty-state">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                </svg>
+                <p>No properties match the selected filters.</p>
+                <button class="btn-clear-filter"
+                  (click)="statusFilter='ALL'; listingFilter='ALL'; searchQuery=''; onSearch()">
+                  Clear filters
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Data rows -->
+          <tr *ngFor="let row of pagedRows; let i = index" class="data-row">
+            <td class="td-num">{{ (currentPage-1)*pageSize + i + 1 }}</td>
+            <td class="td-title">
+              <span class="prop-title">{{ row.title }}</span>
+            </td>
+            <td class="td-city">
+              <span class="city-pill">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ row.city }}
+              </span>
+            </td>
+            <td class="td-price">{{ formatCurrency(row.price) }}</td>
+            <td>
+              <span class="badge" [ngClass]="statusClass(row.status)">
+                {{ row.status | titlecase }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="listingClass(row.listingType)">
+                {{ listingLabel(row.listingType) }}
+              </span>
+            </td>
+            <td class="td-date">{{ formatShortDate(row.createdAt) }}</td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── PAGINATION ── -->
+    <div class="pagination-bar" *ngIf="totalPages > 1">
+      <app-back-button></app-back-button>
+      <div class="pg-info">
+        Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong>
+      </div>
+      <div class="pg-controls">
+        <button class="pg-btn pg-arrow" [disabled]="currentPage === 1" (click)="setPage(1)" title="First">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/>
+          </svg>
+        </button>
+        <button class="pg-btn pg-arrow" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)" title="Previous">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+        </button>
+
+        <ng-container *ngFor="let p of pageNumbers">
+          <span *ngIf="p === -1" class="pg-ellipsis">…</span>
+          <button *ngIf="p !== -1" class="pg-btn" [class.pg-active]="p === currentPage" (click)="setPage(p)">
+            {{ p }}
+          </button>
+        </ng-container>
+
+        <button class="pg-btn pg-arrow" [disabled]="currentPage === totalPages" (click)="setPage(currentPage + 1)" title="Next">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
+        <button class="pg-btn pg-arrow" [disabled]="currentPage === totalPages" (click)="setPage(totalPages)" title="Last">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /report-body -->
+</div>

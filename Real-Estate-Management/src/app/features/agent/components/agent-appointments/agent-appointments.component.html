@@ -1,0 +1,89 @@
+<div class="page">
+ <!-- <div class="back-nav">
+  <app-back-button></app-back-button>
+</div> -->
+  <!-- HEADER -->
+  <div class="page-header">
+    
+    <h2>Visit Requests</h2>
+    <p>Manage buyer visit appointments</p>
+    
+  </div>
+  
+
+  <!-- SUMMARY -->
+  <div class="summary">
+    <div>{{ appointments.length }} Requests</div>
+    <div class="pending-badge" *ngIf="pendingAppointments > 0">
+      {{ pendingAppointments }} Pending
+    </div>
+  </div>
+
+  <!-- LOADER -->
+  <div class="empty" *ngIf="isLoading">Loading…</div>
+
+  <!-- EMPTY -->
+  <div class="empty" *ngIf="!isLoading && appointments.length === 0">
+    No visit requests yet
+  </div>
+
+  <!-- LIST -->
+  <div class="list" *ngIf="!isLoading && appointments.length > 0">
+
+    <div class="card" *ngFor="let a of pagedAppointments">
+
+      <!-- LEFT -->
+      <div class="left">
+
+        <div class="date">
+          <div class="day">{{ formatDate(a.visitDate).day }}</div>
+          <div class="month">{{ formatDate(a.visitDate).month }}</div>
+        </div>
+
+        <div class="info">
+          <div class="title">{{ a.propertyName }}</div>
+          <div class="sub">Buyer: {{ a.buyerName }}</div>
+
+          <div class="meta">
+            <span>{{ formatDate(a.visitDate).time }}</span>
+            <span class="status" [ngClass]="getStatusClass(a.status)">
+              {{ getStatusLabel(a.status) }}
+            </span>
+          </div>
+
+          <div class="note" *ngIf="a.message">{{ a.message }}</div>
+        </div>
+
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions">
+        <button class="reject"
+                (click)="updateAppointment(a.id, 'REJECTED')"
+                [disabled]="updatingId === a.id"
+                *ngIf="isPending(a.status)">
+          Reject
+        </button>
+        <button class="approve"
+                (click)="updateAppointment(a.id, 'APPROVED')"
+                [disabled]="updatingId === a.id"
+                *ngIf="isPending(a.status)">
+          Approve
+        </button>
+        <span *ngIf="!isPending(a.status)" class="done">{{ getStatusLabel(a.status) }}</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ── PAGINATION ── -->
+<!-- ── PAGINATION ── -->
+<div class="pagination-row">
+  <app-back-button></app-back-button>
+  <app-paginator 
+    [currentPage]="currentPage" 
+    [totalPages]="totalPages" 
+    (pageChange)="goToPage($event)">
+  </app-paginator>
+</div>

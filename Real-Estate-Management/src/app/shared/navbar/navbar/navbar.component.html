@@ -1,0 +1,35 @@
+<nav class="navbar">
+
+  <div class="nav-left">
+    <a class="brand-logo"  (click)="goHome()" style="cursor: pointer;">RealEstate</a>
+
+    <a routerLink="/home">Home</a>
+    <a routerLink="/properties">Properties</a>
+    <a routerLink="/appointments">Appointments</a>
+  </div>
+
+  <div class="nav-right">
+
+    <div class="profile-dropdown">
+
+      <button class="profile-btn" (click)="toggleDropdown()">
+        👤 {{ userName }} ▼
+      </button>
+
+      <div class="dropdown-menu" *ngIf="isDropdownOpen">
+
+        <a routerLink="/profile">
+          Profile
+        </a>
+
+        <button (click)="logout()">
+          Logout
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</nav>
